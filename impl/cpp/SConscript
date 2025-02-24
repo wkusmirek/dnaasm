@@ -147,17 +147,17 @@ else:
 
 env_python.Append( CPPDEFINES=['MAX_KMER_LENGTH='+MAX_KMER_LENGTH] )
 
-pythonlib = env_python.SharedLibrary( target = 'lib/dnaasmpy', source = ['src/dnaasmpy.cpp'])
-Requires(pythonlib, dbj_lib)
-Requires(pythonlib, olc_lib)
-Requires(pythonlib, scfr_lib)
-Requires(pythonlib, dnaasm_lib)
+#pythonlib = env_python.SharedLibrary( target = 'lib/dnaasmpy', source = ['src/dnaasmpy.cpp'])
+#Requires(pythonlib, dbj_lib)
+#Requires(pythonlib, olc_lib)
+#Requires(pythonlib, scfr_lib)
+#Requires(pythonlib, dnaasm_lib)
 
-if(UNIX_SYSTEM):
-   target = '../build_web/dnaasmpy/dnaasmpy.so'
-elif(platform.system() == "Windows"):
-   target = '../build_web/dnaasmpy/dnaasmpy.pyd'
-env_python.Command(target, pythonlib, copyLibBuilder )
+#if(UNIX_SYSTEM):
+#   target = '../build_web/dnaasmpy/dnaasmpy.so'
+#elif(platform.system() == "Windows"):
+#   target = '../build_web/dnaasmpy/dnaasmpy.pyd'
+#env_python.Command(target, pythonlib, copyLibBuilder )
 
 
 #------------------------------------------------------------------------------
