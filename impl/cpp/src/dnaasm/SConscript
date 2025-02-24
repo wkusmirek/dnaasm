@@ -1,0 +1,38 @@
+# -*- mode: Python; -*-
+import platform, os
+
+Import('env')
+Import('shared_lib_path')
+Import('MAX_KMER_LENGTH')
+
+#------------------------------------------------------------------------------
+# build dnaasm shared library
+#------------------------------------------------------------------------------
+
+lib_name = 'dnaasm'
+
+env_dll = env.Clone()
+
+if(platform.system() == "Linux"):
+   env_dll.Prepend( LIBS = [ 'boost_thread', 'dnaasm_common', 'dnaasm_dbj', 'dnaasm_olc', 'dnaasm_scfr', 'dnaasm_bst' ] )
+
+elif(platform.system() == "Darwin"):
+   env_dll.Prepend( LIBS = [ 'dnaasm_common', 'dnaasm_dbj', 'dnaasm_olc', 'dnaasm_scfr', 'dnaasm_bst', 'boost_thread-mt', 'boost_system' ] )
+
+elif(platform.system() == "Windows"):
+   env_dll.Append( CPPFLAGS = ' /D "CALC_EXPORTS" /W4 ' )
+   env_dll.Prepend( LIBS = [ 'dnaasm_common', 'dnaasm_dbj', 'dnaasm_olc', 'dnaasm_scfr', 'dnaasm_bst' ] )
+
+
+else:
+   print(platform.system() + " not supported")
+
+env_dll.Append( CPPDEFINES=['MAX_KMER_LENGTH='+MAX_KMER_LENGTH] )
+
+dnaasm_lib = env_dll.SharedLibrary(
+    target = os.path.join(shared_lib_path, lib_name),
+    source = [
+        'CommandManager.cpp'
+    ])
+
+Return('dnaasm_lib')

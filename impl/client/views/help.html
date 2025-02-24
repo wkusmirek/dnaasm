@@ -1,0 +1,54 @@
+<!--
+	@file help.html
+	@brief the AngularJS partial 'help'
+-->
+
+<h1>DnaAssembler - {{'HELP' | translate}}</h1>
+
+<div id="filmFilesColumns">
+	<div id="film_files_left_col">
+		<video width="640" height="480" src="films/demo.mp4" type="video/mp4" controls>
+			Your browser does not support the video tag.
+		</video><br><br>
+	</div>
+	<div id="film_files_right_col">
+		<br><br><br><br><br><br><br><br><br><br>
+		<fieldset class="fieldset-auto-width">
+	  		<legend id="demo_files_legend">{{'DEMO_FILES' | translate}}</legend>
+			<a href="/public/example_files/reads_PET_R1.fq" id="reads_PET_R1.fq_href" title="{{'DOWNLOAD_READS_PET_R1_TITLE' | translate}}" download>reads_PET_R1.fq</a><br>
+			<a href="/public/example_files/reads_PET_R2.fq" id="reads_PET_R2.fq_href" title="{{'DOWNLOAD_READS_PET_R2_TITLE' | translate}}" download>reads_PET_R2.fq</a><br>
+			<a href="/public/example_files/ref.fa" id="ref.fa_href" title="{{'DOWNLOAD_REF_TITLE' | translate}}" download>ref.fa</a><br>
+			<a href="/public/example_files/seq.fa" id="seq.fa_href" title="{{'DOWNLOAD_SEQ_TITLE' | translate}}" download>seq.fa</a><br>
+			<a href="/public/example_files/cmp.vcf" id="cmp.vcf_href" title="{{'DOWNLOAD_CMP_TITLE' | translate}}" download>cmp.vcf</a><br>
+		</fieldset>
+	</div>
+</div>
+
+<p style="clear:both;"></p>
+
+<div class="center">
+	<h4><a href="/#/file_formats" id="file_formats_href" title="{{'IN_OUT_FILE_FORMATS_TITLE' | translate}}">{{'IN_OUT_FILE_FORMATS' | translate}}</a><h4>
+	<h4><a href="/#/algorithms" id="algorithms_href" title="{{'ALGORITHMS_TITLE' | translate}}">{{'ALGORITHMS' | translate}}</a><h4>
+	<h4>{{'MORE_INFORMATION' | translate}}<br>r.m.nowak@elka.pw.edu.pl<br><br></h4>
+</div>
+
+<hr /> 
+
+<div id="helpPageColumns">
+
+	<div id="left_col">
+		<h3>{{'AUTHORS' | translate}}</h3>
+		<span id='authors'>Robert Nowak - r.m.nowak@elka.pw.edu.pl<br>Wiktor Kuśmirek<br><br>{{'UNIVERSITY' | translate}},<br>{{'FACULTY' | translate}},<br>{{'PLACE' | translate}}<br><br></span>
+	</div>
+
+	<div id="right_col">
+		<h3>{{'APPLICATION_PARAMETERS' | translate}}</h3>
+		<ul ng-controller="versionController">
+			<li id="server_time" ng-controller="currentController">{{'TIME' | translate}}: <em id="server_time_val">{{current.time}}</em></li>
+			<li id="db_version">{{'DB_VER' | translate}}: <em id="db_version_val">{{server_ver.database}}</em></li>
+			<li id="server_version">{{'SRV_VER' | translate}}: <em id="server_version_val">{{server_ver.server}}</em></li>
+			<li id="client_version">{{'CLI_VER' | translate}}: <em id="client_version_val">{{client_ver}}</em></li>
+		</ul>
+	</div>
+
+</div>

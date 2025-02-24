@@ -1,0 +1,330 @@
+# -*- mode: Python; -*-
+import platform, os
+
+Import('env')
+Import('copyLibBuilder')
+Import('dbj_lib')
+Import('olc_lib')
+Import('scfr_lib')
+Import('bst_lib')
+Import('common_lib')
+Import('dnaasm_lib')
+Import('UNIX_SYSTEM')
+Import('MAX_KMER_LENGTH')
+
+#------------------------------------------------------------------------------
+# build De Bruijn shared library c++ unit tests
+#------------------------------------------------------------------------------
+
+dbj_test_env = env.Clone()
+
+if(platform.system() == "Linux"):
+   dbj_test_env.Prepend( LIBS = [
+       'dnaasm_dbj',
+       'dnaasm_common',
+       'boost_log',
+       'boost_thread',
+       'boost_system',
+       'boost_regex',
+       'boost_filesystem'
+   ])
+
+elif(platform.system() == "Darwin"):
+    dbj_test_env.Prepend( LIBS = [
+        'dnaasm_dbj',
+        'dnaasm_common',
+        'boost_log-mt',
+        'boost_thread-mt',
+        'boost_system',
+        'boost_regex',
+        'boost_filesystem'
+    ])
+
+elif(platform.system() == "Windows"):
+   dbj_test_env.Prepend( LIBS = [
+        'dnaasm_dbj',
+        'dnaasm_common',
+   ])
+
+else:
+   print(platform.system() + " not supported")
+
+dbj_test_env.Append( CPPDEFINES=['MAX_KMER_LENGTH='+MAX_KMER_LENGTH] )
+
+dnaasm_dbj_test = dbj_test_env.Program( target = '../dnaasm_dbj_test',
+        source = [
+        'dbj/unit_tests/TestMain.cpp',
+        'dbj/unit_tests/TestHashTable.cpp',
+        'dbj/unit_tests/TestHashTableMultipleValue.cpp',
+        'dbj/unit_tests/TestDistanceEstimator.cpp',
+        'dbj/unit_tests/TestSingleGraph.cpp',
+        'dbj/unit_tests/TestAssembly.cpp',
+        'dbj/unit_tests/TestResultantSequencesGenerator.cpp',
+        'dbj/unit_tests/TestEdgeNormalization.cpp',
+        'dbj/unit_tests/TestUnitigsGenerator.cpp',
+        'dbj/unit_tests/TestExistreturnpath.cpp',
+        'dbj/unit_tests/TestHistogram.cpp',
+        'dbj/unit_tests/TestSequencesLengthsHistogram.cpp',
+        'dbj/unit_tests/TestOutput.cpp',
+        'dbj/unit_tests/TestOutputVCF.cpp',
+        'dbj/unit_tests/TestRemoveLowCounterEdges.cpp',
+        'dbj/unit_tests/TestStatistics.cpp',
+        'dbj/unit_tests/TestMismatch.cpp',
+        'dbj/unit_tests/TestHirschbergAlgorithm.cpp',
+        'dbj/unit_tests/TestNeedlemanWunschAlgorithm.cpp',
+        'dbj/unit_tests/TestSequenceAlignment.cpp',
+        'dbj/unit_tests/TestSingleGraphBuilder.cpp',
+        'dbj/unit_tests/TestExtendContigsSubgraph.cpp',
+        'dbj/unit_tests/TestUnitigsToContigsExtension.cpp',
+        'dbj/unit_tests/TestContigsToScaffoldsExtension.cpp',
+        'dbj/unit_tests/TestInwardPairedReadsAdding.cpp',
+        'dbj/unit_tests/TestOutwardPairedReadsAdding.cpp',
+        'dbj/unit_tests/TestCorrectEdgeCounter.cpp',
+        'dbj/unit_tests/TestConnectedVerticesMarker.cpp',
+        'dbj/unit_tests/TestDistanceArrayBuilder.cpp',
+        'dbj/unit_tests/TestJoinExtendedSequences.cpp',
+        'dbj/unit_tests/TestIsLimitedDirectedPath.cpp',
+        'dbj/unit_tests/TestCalcMaxGapSize.cpp',
+        'dbj/unit_tests/TestAllPathsFinder.cpp',
+        'dbj/unit_tests/TestGraphCompressor.cpp',
+        'dbj/unit_tests/TestUnitigsUncompressor.cpp',
+        'dbj/unit_tests/TestIsAcyclic.cpp',
+        'dbj/unit_tests/TestGraphInOutFinder.cpp',
+        'dbj/unit_tests/TestFilterGraph.cpp',
+        'dbj/unit_tests/TestRemoveTips.cpp',
+        'dbj/unit_tests/TestRemoveBubbles.cpp',
+        'dbj/unit_tests/TestKMerCounter.cpp',
+        'dbj/unit_tests/TestClearGraph.cpp',
+        'dbj/unit_tests/TestLowCounterEdgesCoverUncover.cpp'
+])
+
+Requires(dnaasm_dbj_test, dbj_lib)
+Requires(dnaasm_dbj_test, common_lib)
+
+#------------------------------------------------------------------------------
+# build common library c++ unit tests
+#------------------------------------------------------------------------------
+
+common_test_env = env.Clone()
+
+if(UNIX_SYSTEM):
+   common_test_env.Prepend( LIBS = [
+       'dnaasm_common',
+       'dnaasm_dbj',
+       'dnaasm_bst',
+       'dnaasm_scfr',
+       'boost_log',
+       'boost_regex',
+       'boost_filesystem',
+       'boost_system',
+   ])
+
+elif(platform.system() == "Windows"):
+   common_test_env.Prepend( LIBS = ['dnaasm_common', 
+									'dnaasm_dbj', 
+									'dnaasm_bst',
+									'dnaasm_scfr'
+   ] )
+
+else:
+   print(platform.system() + " not supported")
+
+common_test_env.Append( CPPDEFINES=['MAX_KMER_LENGTH='+MAX_KMER_LENGTH] )
+
+dnaasm_common_test = common_test_env.Program( target = '../dnaasm_common_test',
+        source = [
+        'common/unit_tests/TestMain.cpp',
+        'common/unit_tests/TestLog.cpp',
+        'common/unit_tests/TestParameters.cpp',
+        'common/unit_tests/TestFileReader.cpp',
+        'common/unit_tests/TestInputFile.cpp',
+        'common/unit_tests/TestRead.cpp',
+        'common/unit_tests/TestHashTableKeyHash.cpp',
+        'common/unit_tests/TestHashTableKeyEqual.cpp',
+        'common/unit_tests/TestDnaSequenceRepresentationConverter.cpp',
+])
+
+Requires(dnaasm_common_test, common_lib)
+
+#------------------------------------------------------------------------------
+# build Overlap Layout Consensus library c++ unit tests
+#------------------------------------------------------------------------------
+
+olc_test_env = env.Clone()
+
+if(UNIX_SYSTEM):
+   olc_test_env.Prepend( LIBS = [
+       'dnaasm_olc',
+       'dnaasm_common',
+       'boost_system'
+       #'boost_unit_test_framework'
+   ])
+
+elif(platform.system() == "Windows"):
+   olc_test_env.Prepend( LIBS = ['dnaasm_olc', 'dnaasm_common'] )
+
+else:
+   print(platform.system() + " not supported")
+
+# uncomment below when tests use anything from common lib
+# olc_test_env.Append( CPPDEFINES=['MAX_KMER_LENGTH='+MAX_KMER_LENGTH] )
+
+dnaasm_olc_test = olc_test_env.Program( target = '../dnaasm_olc_test',
+        source = [
+        'olc/unit_tests/TestMain.cpp',
+        'olc/unit_tests/TestMinHash.cpp'
+        #'olc/unit_tests/TestSmithWatermanAligner.cpp',
+        #'olc/unit_tests/TestOvlpGraphBuilder.cpp',
+        #'olc/unit_tests/TestLayoutFormer.cpp',
+        #'olc/unit_tests/TestConsensus.cpp'
+])
+
+Requires(dnaasm_olc_test, olc_lib)
+#------------------------------------------------------------------------------
+# build Scaffolder library c++ unit tests
+#------------------------------------------------------------------------------
+
+scfr_test_env = env.Clone()
+
+if(UNIX_SYSTEM):
+   scfr_test_env.Prepend( LIBS = [
+       'dnaasm_scfr',
+       'dnaasm_common',
+       #'boost_unit_test_framework',
+       'boost_log',
+       'boost_system',
+       'boost_regex',
+       'boost_filesystem',
+       'pthread',
+       'gmock'
+   ])
+
+   if(platform.system() == "Darwin"):
+       scfr_test_env.Prepend( LIBS = [
+            'boost_thread-mt',
+       ])
+   else:
+       scfr_test_env.Prepend( LIBS = [
+            'boost_thread',
+       ])
+
+elif(platform.system() == "Windows"):
+   scfr_test_env.Prepend( LIBS = [
+       'dnaasm_scfr',
+       'dnaasm_common',
+       'gmock'
+   ])
+
+else:
+   print(platform.system() + " not supported")
+
+scfr_test_env.Append( CPPDEFINES=['MAX_KMER_LENGTH='+MAX_KMER_LENGTH] )
+scfr_test_env.Append( CPPDEFINES=['GTEST_USE_OWN_TR1_TUPLE=0'] )
+
+dnaasm_scfr_test = scfr_test_env.Program( target = '../dnaasm_scfr_test',
+        source = [
+        'scfr/unit_tests/TestMain.cpp',
+        'scfr/unit_tests/TestCommon.cpp',
+        'scfr/unit_tests/TestBloomFilter.cpp',
+        'scfr/unit_tests/TestBloomFilterFiller.cpp',
+        'scfr/unit_tests/TestMatepairGraph.cpp',
+        'scfr/unit_tests/TestMatepairGraphBuilder.cpp',
+        'scfr/unit_tests/TestKmerPositionFinder.cpp',
+        'scfr/unit_tests/TestScaffolder.cpp',
+        'scfr/unit_tests/TestScaffold.cpp',
+        'scfr/unit_tests/TestContigPairGraph.cpp',
+        'scfr/unit_tests/TestContigPairMaker.cpp',
+        'scfr/unit_tests/TestContigLoader.cpp'
+])
+
+Requires(dnaasm_scfr_test, scfr_lib)
+Requires(dnaasm_scfr_test, common_lib)
+
+
+#------------------------------------------------------------------------------
+# build Blast library c++ unit tests
+#------------------------------------------------------------------------------
+bst_test_env = env.Clone()
+
+if(platform.system() == "Linux"):
+   bst_test_env.Prepend( LIBS = [
+       'dnaasm_bst',
+       'dnaasm_common',
+       'boost_system',
+       'boost_thread'
+   ])
+elif(platform.system() == "Darwin"):
+  bst_test_env.Prepend( LIBS = [
+      'dnaasm_bst',
+      'dnaasm_common',
+      'boost_system',
+      'boost_thread-mt'
+  ])
+
+elif(platform.system() == "Windows"):
+   bst_test_env.Prepend( LIBS = [
+       'dnaasm_bst',
+       'dnaasm_common',
+   ])
+
+else:
+   print(platform.system() + " not supported")
+
+dnaasm_bst_test = bst_test_env.Program( target = '../dnaasm_bst_test',
+        source = [
+        'bst/unit_tests/TestMain.cpp',
+        'bst/unit_tests/TestBlast.cpp',
+        'bst/unit_tests/TestWord.cpp',
+        'bst/unit_tests/TestChainer.cpp',
+        'bst/unit_tests/TestGraphBuilder.cpp',
+        'bst/unit_tests/TestConsensus.cpp'
+])
+
+Requires(dnaasm_bst_test, bst_lib)
+Requires(dnaasm_bst_test, common_lib)
+
+#------------------------------------------------------------------------------
+# build libdnaasm c++ unit tests
+#------------------------------------------------------------------------------
+
+dnaasm_test_env = env.Clone()
+
+if(platform.system() == "Linux"):
+    dnaasm_test_env.Prepend( LIBS = [
+        'dnaasm',
+        'dnaasm_common',
+        'boost_log',
+        'boost_system',
+        'boost_thread',
+        'boost_regex',
+        'dnaasm_dbj',   # FIXME change tests!!!
+        'dnaasm_scfr',
+        'dnaasm_olc',
+        'dnaasm_bst'
+    ])
+elif(platform.system() == "Darwin"):
+    dnaasm_test_env.Prepend( LIBS = [
+        'dnaasm',
+        'dnaasm_common',
+        'boost_log-mt',
+        'boost_system',
+        'boost_thread-mt',
+    ])
+
+elif(platform.system() == "Windows"):
+    dnaasm_test_env.Prepend( LIBS = [
+        'dnaasm',
+        'dnaasm_common',
+    ])
+else:
+    print(platform.system() + " not supported")
+
+dnaasm_test_env.Append( CPPDEFINES=['MAX_KMER_LENGTH='+MAX_KMER_LENGTH] )
+
+dnaasm_dnaasm_test = dnaasm_test_env.Program( target = '../dnaasm_test',
+        source = [
+        'dnaasm/unit_tests/TestCommandManager.cpp',
+        'dnaasm/unit_tests/TestMain.cpp',
+        ]
+)
+Requires(dnaasm_dnaasm_test, dnaasm_lib)

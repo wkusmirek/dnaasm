@@ -1,0 +1,429 @@
+<div ng-controller="assemblingController">
+	<div ng-controller="userAssemblingController">
+		<button id="addTaskButton" ng-click="addVarChange()" ng-disabled="updateVar" title="{{'ADD_TASK_TITLE' | translate}}">{{'ADD_TASK' | translate}}</button>
+
+		<p ng-show="addVar">
+		<table ng-show="addVar">
+			<tr>
+				<td>
+					<table ng-show="addVar" class="addTaskTable">
+						<tr>
+							<td id="addTask_enterName">{{'TASK_NAME' | translate}}:</td>
+							<td><input type=text id="addTaskName" class="center" title="{{'TASK_NAME_TITLE' | translate}}"></td>
+						</tr>
+						<tr>
+							<td id="addTask_enterK">{{'K' | translate}}:</td>
+							<td><input type="text" id="addK" ng-model="addK" class="center" title="{{'K_TITLE' | translate}}"></td>
+						</tr>
+						<tr>
+							<td id="addTask_enterGenomeLength">{{'GENOME_LENGTH' | translate}}:</td>
+							<td><input type="text" id="addGenomeLength" ng-model="addGenomeLength" class="center" title="{{'GENOME_LENGTH_TITLE' | translate}}"></td>
+						</tr>
+						<tr>
+							<td id="addTask_enterInsertSizeMeanInward">{{'INSERT_SIZE_MEAN_INWARD' | translate}}:</td>
+							<td><input type="text" id="addInsertSizeMeanInward" ng-model="addInsertSizeMeanInward" class="center" ng-disabled="insertSizeMeanInwardDisable" title="{{'INSERT_SIZE_MEAN_INWARD_TITLE' | translate}}"></td>
+						</tr>
+						<tr>
+							<td id="addTask_enterInsertSizeStdDevInward">{{'INSERT_SIZE_STD_DEV_INWARD' | translate}}:</td>
+							<td><input type="text" id="addInsertSizeStdDevInward" ng-model="addInsertSizeStdDevInward" class="center" ng-disabled="insertSizeStdDevInwardDisable" title="{{'INSERT_SIZE_STD_DEV_INWARD_TITLE' | translate}}"></td>
+						</tr>
+						<tr>
+							<td id="addTask_enterInsertSizeMeanOutward">{{'INSERT_SIZE_MEAN_OUTWARD' | translate}}:</td>
+							<td><input type="text" id="addInsertSizeMeanOutward" ng-model="addInsertSizeMeanOutward" class="center" ng-disabled="insertSizeMeanOutwardDisable" title="{{'INSERT_SIZE_MEAN_OUTWARD_TITLE' | translate}}"></td>
+						</tr>
+						<tr>
+							<td id="addTask_enterInsertSizeStdDevOutward">{{'INSERT_SIZE_STD_DEV_OUTWARD' | translate}}:</td>
+							<td><input type="text" id="addInsertSizeStdDevOutward" ng-model="addInsertSizeStdDevOutward" class="center" ng-disabled="insertSizeStdDevOutwardDisable" title="{{'INSERT_SIZE_STD_DEV_OUTWARD_TITLE' | translate}}"></td>
+						</tr>
+						<tr>
+							<td id="addTask_enterQualityThreshold">{{'QUALITY_THRESHOLD' | translate}}:</td>
+							<td><input type="text" id="addT" ng-model="addT" class="center" title="{{'T_TITLE' | translate}}"></td>
+						</tr>
+						<tr>
+							<td id="addTask_enterBfcounterThreshold">{{'BFCOUNTER_THRESHOLD' | translate}}:</td>
+							<td><input type="text" id="addBfcounterThreshold" ng-model="addBfcounterThreshold" class="center" title="{{'BFCOUNTER_THRESHOLD_TITLE' | translate}}"></td>
+						</tr>
+						<tr>
+							<td id="addTask_enterSingleEdgeCounterThreshold">{{'SINGLE_EDGE_COUNTER_THRESHOLD' | translate}}:</td>
+							<td><input type="text" id="addSingleEdgeCounterThreshold" ng-model="addSingleEdgeCounterThreshold" class="center" title="{{'SINGLE_EDGE_COUNTER_THRESHOLD_TITLE' | translate}}"></td>
+						</tr>
+						<tr>
+							<td id="addTask_enterPairedReadsPetThresholdFrom">{{'PAIRED_READS_PET_THRESHOLD_FROM' | translate}}:</td>
+							<td><input type="text" id="addPairedReadsPetThresholdFrom" ng-model="addPairedReadsPetThresholdFrom" class="center" ng-disabled="pairedReadsPetThresholdFromDisable" title="{{'PAIRED_READS_PET_THRESHOLD_FROM_TITLE' | translate}}"></td>
+						</tr>
+						<tr>
+							<td id="addTask_enterPairedReadsPetThresholdTo">{{'PAIRED_READS_PET_THRESHOLD_TO' | translate}}:</td>
+							<td><input type="text" id="addPairedReadsPetThresholdTo" ng-model="addPairedReadsPetThresholdTo" class="center" ng-disabled="pairedReadsPetThresholdToDisable" title="{{'PAIRED_READS_PET_THRESHOLD_TO_TITLE' | translate}}"></td>
+						</tr>
+						<tr>
+							<td id="addTask_enterPairedReadsMpThresholdFrom">{{'PAIRED_READS_MP_THRESHOLD_FROM' | translate}}:</td>
+							<td><input type="text" id="addPairedReadsMpThresholdFrom" ng-model="addPairedReadsMpThresholdFrom" class="center" ng-disabled="pairedReadsMpThresholdFromDisable" title="{{'PAIRED_READS_MP_THRESHOLD_FROM_TITLE' | translate}}"></td>
+						</tr>
+						<tr>
+							<td id="addTask_enterPairedReadsMpThresholdTo">{{'PAIRED_READS_MP_THRESHOLD_TO' | translate}}:</td>
+							<td><input type="text" id="addPairedReadsMpThresholdTo" ng-model="addPairedReadsMpThresholdTo" class="center" ng-disabled="pairedReadsMpThresholdToDisable" title="{{'PAIRED_READS_MP_THRESHOLD_TO_TITLE' | translate}}"></td>
+						</tr>
+						<tr>
+							<td id="addTask_choosePairedReadsAlgorithm">{{'PAIRED_READS_ALGORITHM' | translate}}:</td>
+							<td>
+								<select id="addPairedReadsAlgorithm" ng-model="addPairedReadsAlgorithm" name="addPairedReadsAlgorithm" ng-change="addPairedReadsAlgorithmChange()" ng-init="addPairedReadsAlgorithm='0'" title="{{'PAIRED_READS_ALGORITHM_TITLE' | translate}}">
+									<option id="addTask_none" selected="selected" value="0">{{'NONE_ALGORITHM' | translate}}</option>
+									<option id="addTask_velvet" value="1">{{'VELVET_ALGORITHM' | translate}}</option>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td id="addTask_correctGraph">{{'CORRECTION' | translate}}:</td>
+							<td><input type="checkbox" id="addCorrect" name="addCorrect" title="{{'CORRECT_GRAPH_TITLE' | translate}}" checked/></td>
+						</tr>
+						<tr>
+							<td id="addTask_inputFileComment" colspan="2">{{'INPUT_FILE_COMMENT' | translate}}:</td>
+						</tr>
+						<tr>
+							<td id="addTask_i1_1">{{'INPUT_FILE_I1_1_LONG' | translate}}:</td>
+							<td>
+								<div ng-controller="userFilesController">
+									<select id="add_i1_1" ng-model="add_i1_1" name="add_i1_1" title="{{'I1_1_TITLE' | translate}}">
+										<option id="add_i1_1_option_no_input" value="">{{'NO_INPUT' | translate}}</option>
+										<option id="add_i1_1_option_{{row.file_name}}" value="{{row.file_name}}" ng-model="row" ng-repeat="row in user_files_fasta">{{row.file_name}}</option>
+										<option id="add_i1_1_option_{{row.file_name}}" value="{{row.file_name}}" ng-model="row" ng-repeat="row in user_files_fastq">{{row.file_name}}</option>
+									</select>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td id="addTask_i1_2">{{'INPUT_FILE_I1_2_LONG' | translate}}:</td>
+							<td>
+								<div ng-controller="userFilesController">
+									<select id="add_i1_2" ng-model="add_i1_2" name="add_i1_2" title="{{'I1_2_TITLE' | translate}}">
+										<option id="add_i1_2_option_no_input" value="">{{'NO_INPUT' | translate}}</option>
+										<option id="add_i1_2_option_{{row.file_name}}" value="{{row.file_name}}" ng-model="row" ng-repeat="row in user_files_fasta">{{row.file_name}}</option>
+										<option id="add_i1_2_option_{{row.file_name}}" value="{{row.file_name}}" ng-model="row" ng-repeat="row in user_files_fastq">{{row.file_name}}</option>
+									</select>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td id="addTask_o1_1">{{'INPUT_FILE_O1_1_LONG' | translate}}:</td>
+							<td>
+								<div ng-controller="userFilesController">
+									<select id="add_o1_1" ng-model="add_o1_1" name="add_o1_1" title="{{'O1_1_TITLE' | translate}}">
+										<option id="add_o1_1_option_no_input" value="">{{'NO_INPUT' | translate}}</option>
+										<option id="add_o1_1_option_{{row.file_name}}" value="{{row.file_name}}" ng-model="row" ng-repeat="row in user_files_fasta">{{row.file_name}}</option>
+										<option id="add_o1_1_option_{{row.file_name}}" value="{{row.file_name}}" ng-model="row" ng-repeat="row in user_files_fastq">{{row.file_name}}</option>
+									</select>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td id="addTask_o1_2">{{'INPUT_FILE_O1_2_LONG' | translate}}:</td>
+							<td>
+								<div ng-controller="userFilesController">
+									<select id="add_o1_2" ng-model="add_o1_2" name="add_o1_2" title="{{'O1_2_TITLE' | translate}}">
+										<option id="add_o1_2_option_no_input" value="">{{'NO_INPUT' | translate}}</option>
+										<option id="add_o1_2_option_{{row.file_name}}" value="{{row.file_name}}" ng-model="row" ng-repeat="row in user_files_fasta">{{row.file_name}}</option>
+										<option id="add_o1_2_option_{{row.file_name}}" value="{{row.file_name}}" ng-model="row" ng-repeat="row in user_files_fastq">{{row.file_name}}</option>
+									</select>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td id="addTask_assemblyResultNotification">{{'MAIL_NOTIFICATION' | translate}}:</td>
+							<td><input type="checkbox" id="addTask_assemblyResultNotificationCheckbox" name="addTask_assemblyResultNotificationCheckbox" ng-model="addTask_assemblyResultNotificationCheckbox" title="{{'MAIL_NOTIFICATION_TITLE' | translate}}"/></td>
+						</tr>
+						<tr ng-show="addTask_assemblyResultNotificationCheckbox">
+							<td>{{'EMAIL_ADDRESS_SMALL' | translate}}:</td>
+							<td><input type="text" id="addTask_assemblyMailAddress" name="addTask_assemblyMailAddress" ng-model="addTask_assemblyMailAddress" title="{{'EMAIL_ADDRESS_TITLE' | translate}}"/></td>
+						</tr>
+						<tr>
+							<td id="addTask_assemblyShowResultUrl">{{'SHOW_RESULT_URL' | translate}}:</td>
+							<td><input type="checkbox" id="addTask_assemblyShowResultUrlCheckbox" name="addTask_assemblyShowResultUrlCheckbox" title="{{'SHOW_RESULT_URL_TITLE' | translate}}"/></td>
+						</tr>
+						<tr>
+							<td id="addTask_createScaffold">{{'MAKE_SCAFFOLD' | translate}}:</td>
+							<td><input type="checkbox" id="addTask_generateScaffoldCheckbox" name="addTask_generateScaffoldCheckbox" ng_model="addTask_generateScaffoldCheckbox" title="{{'MAKE_SCAFFOLD_TITLE' | translate}}"/></td>
+						</tr>
+						<tr>
+							<td><button id="addTaskSubmitButton" ng-click="addTask()" title="{{'ADD_TASK_SUBMIT_TITLE' | translate}}">{{'SUBMIT' | translate}}!</button></td>
+						</tr>
+					</table>
+				</td>
+				<td>
+					<h4 ng-show="addTask_generateScaffoldCheckbox">{{'SCAFFOLDER_SETTINGS' | translate}}:</h4>
+					<table ng-show="addTask_generateScaffoldCheckbox" class="addTaskTable">
+						<tr>
+							<td id="addTask_long_reads">{{'INPUT_FILE_LONG_READS' | translate}}:</td>
+							<td>
+								<div ng-controller="userFilesController">
+									<select id="add_long_reads" ng-model="add_long_reads" name="add_long_reads" title="{{'INPUT_FILE_LONG_READS_TITLE' | translate}}">
+										<option id="add_long_reads_option_no_input" value="">{{'NO_INPUT' | translate}}</option>
+										<option id="add_long_reads_option_{{row.file_name}}" value="{{row.file_name}}" ng-model="row" ng-repeat="row in user_files_fasta">{{row.file_name}}</option>
+										<option id="add_long_reads_option_{{row.file_name}}" value="{{row.file_name}}" ng-model="row" ng-repeat="row in user_files_fastq">{{row.file_name}}</option>
+									</select>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td id="enterKmerSize">{{'KMER_SIZE' | translate}}:</td>
+							<td><input type="text" id="addKmerSize" ng-model="addKmerSize" class="center" title="{{'KMER_SIZE_TITLE' | translate}}"></td>
+						</tr>
+						<tr>
+							<td id="enterDistance">{{'DISTANCE' | translate}}:</td>
+							<td><input type="text" id="addDistance" ng-model="addDistance" class="center" title="{{'DISTANCE_TITLE' | translate}}"></td>
+						</tr>
+						<tr>
+							<td id="enterStep">{{'STEP' | translate}}:</td>
+							<td><input type="text" id="addStep" ng-model="addStep" class="center" title="{{'STEP_TITLE' | translate}}"></td>
+						</tr>
+						<tr>
+							<td id="enterMinLinks">{{'MIN_LINKS' | translate}}:</td>
+							<td><input type="text" id="addMinLinks" ng-model="addMinLinks" class="center" title="{{'MIN_LINKS_TITLE' | translate}}"></td>
+						</tr>
+						<tr>
+							<td id="enterMaxRatio">{{'MAX_RATIO' | translate}}:</td>
+							<td><input type="text" id="addMaxRatio" ng-model="addMaxRatio" class="center" title="{{'MAX_RATIO_TITLE' | translate}}"></td>
+						</tr>
+						<tr>
+							<td id="enterMinContigLength">{{'MIN_CONTIG_LENGTH' | translate}}:</td>
+							<td><input type="text" id="addMinContigLength" ng-model="addMinContigLength" class="center" title="{{'MIN_CONTIG_LENGTH_TITLE' | translate}}"></td>
+						</tr>
+					</table></td>
+			</tr>
+		</table>
+
+		</p>
+
+		<p ng-show="updateVar">
+		<b>{{'UPDATE_INSTRUCTION' | translate}}{{actualTaskId}}</b>
+		<table ng-show="updateVar">
+			<tr>
+				<td>
+					<table ng-show="updateVar" class="updateTaskTable">
+						<!--<tr>
+		  <td id="updateTask_enterName">{{'TASK_NAME' | translate}}:</td>
+		  <td><input type=text id="updateTaskName" class="center" title="{{'TASK_NAME_TITLE' | translate}}"></td>
+		  </tr>-->
+		  <tr>
+			  <td id="updateTask_enterK">{{'K' | translate}}:</td>
+			  <td><input type="text" id="updateK" class="center" title="{{'K_TITLE' | translate}}"></td>
+		  </tr>
+		  <tr>
+			  <td id="updateTask_enterGenomeLength">{{'GENOME_LENGTH' | translate}}:</td>
+			  <td><input type="text" id="updateGenomeLength" class="center" title="{{'GENOME_LENGTH_TITLE' | translate}}"></td>
+		  </tr>
+		  <tr>
+			  <td id="updateTask_enterInsertSizeMeanInward">{{'INSERT_SIZE_MEAN_INWARD' | translate}}:</td>
+			  <td><input type="text" id="updateInsertSizeMeanInward" class="center" title="{{'INSERT_SIZE_MEAN_INWARD_TITLE' | translate}}"></td>
+		  </tr>
+		  <tr>
+			  <td id="updateTask_enterInsertSizeStdDevInward">{{'INSERT_SIZE_STD_DEV_INWARD' | translate}}:</td>
+			  <td><input type="text" id="updateInsertSizeStdDevInward" class="center" title="{{'INSERT_SIZE_STD_DEV_INWARD_TITLE' | translate}}"></td>
+		  </tr>
+		  <tr>
+			  <td id="updateTask_enterInsertSizeMeanOutward">{{'INSERT_SIZE_MEAN_OUTWARD' | translate}}:</td>
+			  <td><input type="text" id="updateInsertSizeMeanOutward" class="center" title="{{'INSERT_SIZE_MEAN_OUTWARD_TITLE' | translate}}"></td>
+		  </tr>
+		  <tr>
+			  <td id="updateTask_enterInsertSizeStdDevOutward">{{'INSERT_SIZE_STD_DEV_OUTWARD' | translate}}:</td>
+			  <td><input type="text" id="updateInsertSizeStdDevOutward" class="center" title="{{'INSERT_SIZE_STD_DEV_OUTWARD_TITLE' | translate}}"></td>
+		  </tr>
+		  <tr>
+			  <td id="updateTask_enterQualityThreshold">{{'QUALITY_THRESHOLD' | translate}}:</td>
+			  <td><input type="text" id="updateT" class="center" title="{{'T_TITLE' | translate}}"></td>
+		  </tr>
+		  <tr>
+			  <td id="updateTask_enterBfcounterThreshold">{{'BFCOUNTER_THRESHOLD' | translate}}:</td>
+			  <td><input type="text" id="updateBfcounterThreshold" ng-model="updateBfcounterThreshold" class="center" title="{{'BFCOUNTER_THRESHOLD_TITLE' | translate}}"></td>
+		  </tr>
+		  <tr>
+			  <td id="updateTask_enterSingleEdgeCounterThreshold">{{'SINGLE_EDGE_COUNTER_THRESHOLD' | translate}}:</td>
+			  <td><input type="text" id="updateSingleEdgeCounterThreshold" ng-model="updateSingleEdgeCounterThreshold" class="center" title="{{'SINGLE_EDGE_COUNTER_THRESHOLD_TITLE' | translate}}"></td>
+		  </tr>
+		  <tr>
+			  <td id="updateTask_enterPairedReadsPetThresholdFrom">{{'PAIRED_READS_PET_THRESHOLD_FROM' | translate}}:</td>
+			  <td><input type="text" id="updatePairedReadsPetThresholdFrom" ng-model="updatePairedReadsPetThresholdFrom" class="center" title="{{'PAIRED_READS_PET_THRESHOLD_FROM_TITLE' | translate}}"></td>
+		  </tr>
+		  <tr>
+			  <td id="updateTask_enterPairedReadsPetThresholdTo">{{'PAIRED_READS_PET_THRESHOLD_TO' | translate}}:</td>
+			  <td><input type="text" id="updatePairedReadsPetThresholdTo" ng-model="updatePairedReadsPetThresholdTo" class="center" title="{{'PAIRED_READS_PET_THRESHOLD_TO_TITLE' | translate}}"></td>
+		  </tr>
+		  <tr>
+			  <td id="updateTask_enterPairedReadsMpThresholdFrom">{{'PAIRED_READS_MP_THRESHOLD_FROM' | translate}}:</td>
+			  <td><input type="text" id="updatePairedReadsMpThresholdFrom" ng-model="updatePairedReadsMpThresholdFrom" class="center" title="{{'PAIRED_READS_MP_THRESHOLD_FROM_TITLE' | translate}}"></td>
+		  </tr>
+		  <tr>
+			  <td id="updateTask_enterPairedReadsMpThresholdTo">{{'PAIRED_READS_MP_THRESHOLD_TO' | translate}}:</td>
+			  <td><input type="text" id="updatePairedReadsMpThresholdTo" ng-model="updatePairedReadsMpThresholdTo" class="center" title="{{'PAIRED_READS_MP_THRESHOLD_TO_TITLE' | translate}}"></td>
+		  </tr>
+		  <tr>
+			  <td id="updateTask_choosePairedReadsAlgorithm">{{'PAIRED_READS_ALGORITHM' | translate}}:</td>
+			  <td>
+				  <select id="updatePairedReadsAlgorithm" name="updatePairedReadsAlgorithm" title="{{'PAIRED_READS_ALGORITHM_TITLE' | translate}}">
+					  <option id="updateTask_none" value="0">{{'NONE_ALGORITHM' | translate}}</option>
+					  <option id="updateTask_velvet" value="1">{{'VELVET_ALGORITHM' | translate}}</option>
+				  </select>
+			  </td>
+		  </tr>
+		  <tr>
+			  <td id="updateTask_correctGraph">{{'CORRECTION' | translate}}:</td>
+			  <td><input type="checkbox" id="updateCorrect" name="updateCorrect" title="{{'CORRECT_GRAPH_TITLE' | translate}}" checked/></td>
+		  </tr>
+		  <tr>
+			  <td id="updateTask_i1_1">{{'INPUT_FILE_I1_1_LONG' | translate}}:</td>
+			  <td>
+				  <input type="text" id="update_i1_1" ng-model="update_i1_1" name="update_i1_1" title="{{'I1_1_TITLE' | translate}}" disabled class="center">
+			  </td>
+		  </tr>
+		  <tr>
+			  <td id="updateTask_i1_2">{{'INPUT_FILE_I1_2_LONG' | translate}}:</td>
+			  <td>
+				  <input type="text" id="update_i1_2" ng-model="update_i1_2" name="update_i1_2" title="{{'I1_2_TITLE' | translate}}" disabled class="center">
+			  </td>
+		  </tr>
+		  <tr>
+			  <td id="updateTask_o1_1">{{'INPUT_FILE_O1_1_LONG' | translate}}:</td>
+			  <td>
+				  <input type="text" id="update_o1_1" ng-model="update_o1_1" name="update_o1_1" title="{{'O1_1_TITLE' | translate}}" disabled class="center">
+			  </td>
+		  </tr>
+		  <tr>
+			  <td id="updateTask_o1_2">{{'INPUT_FILE_O1_2_LONG' | translate}}:</td>
+			  <td>
+				  <input type="text" id="update_o1_2" ng-model="update_o1_2" name="update_o1_2" title="{{'O1_2_TITLE' | translate}}" disabled class="center">
+			  </td>
+		  </tr>
+		  <tr>
+			  <td id="updateTask_assemblyResultNotification">{{'MAIL_NOTIFICATION' | translate}}:</td>
+			  <td><input type="checkbox" id="updateTask_assemblyResultNotificationCheckbox" name="updateTask_assemblyResultNotificationCheckbox" ng-model="updateTask_assemblyResultNotificationCheckbox" title="{{'MAIL_NOTIFICATION_TITLE' | translate}}"/></td>
+		  </tr>
+		  <tr ng-show="updateTask_assemblyResultNotificationCheckbox">
+			  <td>{{'EMAIL_ADDRESS_SMALL' | translate}}:</td>
+			  <td><input type="text" id="updateTask_assemblyMailAddress" name="updateTask_assemblyMailAddress" ng-model="updateTask_assemblyMailAddress" title="{{'EMAIL_ADDRESS_TITLE' | translate}}"/></td>
+		  </tr>
+		  <tr>
+			  <td id="updateTask_assemblyShowResultUrl">{{'SHOW_RESULT_URL' | translate}}:</td>
+			  <td><input type="checkbox" id="updateTask_assemblyShowResultUrlCheckbox" name="updateTask_assemblyShowResultUrlCheckbox" title="{{'SHOW_RESULT_URL_TITLE' | translate}}"/></td>
+		  </tr>
+		  <tr>
+			  <td id="updateTask_createScaffold">{{'MAKE_SCAFFOLD' | translate}}:</td>
+			  <td><input type="checkbox" id="updateTask_generateScaffoldCheckbox" name="updateTask_generateScaffoldCheckbox" ng_model="updateTask_generateScaffoldCheckbox" title="{{'MAKE_SCAFFOLD_TITLE' | translate}}"/></td>
+		  </tr>
+		  <tr>
+			  <td id="updateTask_submit"><button id="updateTaskSubmitButton" ng-click="updateTask()" title="{{'UPDATE_TASK_SUBMIT_TITLE' | translate}}">{{'SUBMIT' | translate}}!</button></td>
+		  </tr>
+					</table>
+				</td>
+				<td>
+					<h4 ng-show="updateTask_generateScaffoldCheckbox">{{'SCAFFOLDER_SETTINGS' | translate}}:</h4>
+					<table ng-show="updateTask_generateScaffoldCheckbox" class="updateTaskTable">
+						<tr>
+							<td id="updateTask_long_reads">{{'INPUT_FILE_LONG_READS' | translate}}:</td>
+							<td>
+								<div ng-controller="userFilesController">
+									<select id="update_long_reads" ng-model="update_long_reads" name="update_long_reads" title="{{'INPUT_FILE_LONG_READS_TITLE' | translate}}">
+										<option id="update_long_reads_option_no_input" value="">{{'NO_INPUT' | translate}}</option>
+										<option id="update_long_reads_option_{{row.file_name}}" value="{{row.file_name}}" ng-model="row" ng-repeat="row in user_files_fasta">{{row.file_name}}</option>
+										<option id="update_long_reads_option_{{row.file_name}}" value="{{row.file_name}}" ng-model="row" ng-repeat="row in user_files_fastq">{{row.file_name}}</option>
+									</select>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td id="updateTask_enterKmerSize">{{'KMER_SIZE' | translate}}:</td>
+							<td><input type="text" id="updateKmerSize" ng-model="updateKmerSize" class="center" title="{{'KMER_SIZE_TITLE' | translate}}"></td>
+						</tr>
+						<tr>
+							<td id="updateTask_enterDistance">{{'DISTANCE' | translate}}:</td>
+							<td><input type="text" id="updateDistance" ng-model="updateDistance" class="center" title="{{'DISTANCE_TITLE' | translate}}"></td>
+						</tr>
+						<tr>
+							<td id="updateTask_enterStep">{{'STEP' | translate}}:</td>
+							<td><input type="text" id="updateStep" ng-model="updateStep" class="center" title="{{'STEP_TITLE' | translate}}"></td>
+						</tr>
+						<tr>
+							<td id="updateTask_enterMinLinks">{{'MIN_LINKS' | translate}}:</td>
+							<td><input type="text" id="updateMinLinks" ng-model="updateMinLinks" class="center" title="{{'MIN_LINKS_TITLE' | translate}}"></td>
+						</tr>
+						<tr>
+							<td id="updateTask_enterMaxRatio">{{'MAX_RATIO' | translate}}:</td>
+							<td><input type="text" id="updateMaxRatio" ng-model="updateMaxRatio" class="center" title="{{'MAX_RATIO_TITLE' | translate}}"></td>
+						</tr>
+						<tr>
+							<td id="updateTask_enterMinContigLength">{{'MIN_CONTIG_LENGTH' | translate}}:</td>
+							<td><input type="text" id="updateMinContigLength" ng-model="updateMinContigLength" class="center" title="{{'MIN_CONTIG_LENGTH_TITLE' | translate}}"></td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+		</p>
+
+		<table class="taskTable">
+			<tr>
+				<th>{{'ID' | translate}}</th>
+				<th>{{'TASK_NAME' | translate}}</th>
+				<th>{{'INPUT_FILE_I1_1' | translate}}</th>
+				<th>{{'INPUT_FILE_I1_2' | translate}}</th>
+				<th>{{'INPUT_FILE_O1_1' | translate}}</th>
+				<th>{{'INPUT_FILE_O1_2' | translate}}</th>
+				<th>{{'PAIRED_READS_ALGORITHM' | translate}}</th>
+				<th>{{'K' | translate}}</th>
+				<th>{{'GENOME_LENGTH' | translate}}</th>
+				<th>{{'INSERT_SIZE_MEAN_INWARD' | translate}}</th>
+				<th>{{'INSERT_SIZE_STD_DEV_INWARD' | translate}}</th>
+				<th>{{'INSERT_SIZE_MEAN_OUTWARD' | translate}}</th>
+				<th>{{'INSERT_SIZE_STD_DEV_OUTWARD' | translate}}</th>
+				<th>{{'QUALITY_THRESHOLD' | translate}}</th>
+				<th>{{'BFCOUNTER_THRESHOLD' | translate}}</th>
+				<th>{{'SINGLE_EDGE_COUNTER_THRESHOLD' | translate}}</th>
+				<th>{{'PAIRED_READS_PET_THRESHOLD_FROM' | translate}}</th>
+				<th>{{'PAIRED_READS_PET_THRESHOLD_TO' | translate}}</th>
+				<th>{{'PAIRED_READS_MP_THRESHOLD_FROM' | translate}}</th>
+				<th>{{'PAIRED_READS_MP_THRESHOLD_TO' | translate}}</th>
+				<th>{{'CORRECTION' | translate}}</th>
+				<th>{{'INPUT_TIME' | translate}}</th>
+				<th>{{'OUTPUT_TIME' | translate}}</th>
+				<th>{{'SEE_RESULT' | translate}}</th>
+				<th>{{'DOWNLOAD_RESULT' | translate}}</th>
+				<th>{{'BREAK' | translate}}</th>
+				<th>{{'DELETE' | translate}}</th>
+				<th></th> 
+				<th></th>
+				<th></th>
+			</tr>
+			<tr ng-model="row" ng-repeat="row in user_assembling_tasks" class="center">
+				<td id="task_id{{row.id}}">{{row.id}}</td>
+				<td id="task_name{{row.id}}">{{row.name}}</td>
+				<td id="i1_1_file_name{{row.id}}"></td>
+				<td id="i1_2_file_name{{row.id}}"></td>
+				<td id="o1_1_file_name{{row.id}}"></td>
+				<td id="o1_2_file_name{{row.id}}">{{parseFileName(row.id, row.i1_1_file_name, row.i1_2_file_name, row.o1_1_file_name, row.o1_2_file_name)}}</td>
+				<td id="pairedReadsAlgorithm{{row.id}}">{{row.paired_reads_algorithm}}</td>
+				<td>{{row.k}}</td>
+				<td>{{row.genome_length}}</td>
+				<td id="insertSizeMeanInward{{row.id}}">
+					<td id="insertSizeStdDevInward{{row.id}}">
+						<td id="insertSizeMeanOutward{{row.id}}">
+							<td id="insertSizeStdDevOutward{{row.id}}">
+								<td>{{row.quality_threshold}}</td>
+								<td>{{row.bfcounter_threshold}}</td>
+								<td>{{row.single_edge_counter_threshold}}</td>
+								<td id="pairedReadsPetThresholdFrom{{row.id}}">
+									<td id="pairedReadsPetThresholdTo{{row.id}}">
+										<td id="pairedReadsMpThresholdFrom{{row.id}}">
+											<td id="pairedReadsMpThresholdTo{{row.id}}">{{parsePairedReadsAlgorithm(row.id, row.paired_reads_algorithm, row.insert_size_mean_inward, row.insert_size_std_dev_inward, row.insert_size_mean_outward, row.insert_size_std_dev_outward, row.paired_reads_pet_threshold_from, row.paired_reads_pet_threshold_to, row.paired_reads_mp_threshold_from, row.paired_reads_mp_threshold_to)}}</td>
+											<td>{{row.correct}}</td>
+											<td id="inputTime{{row.id}}"></td>
+											<td id="outputTime{{row.id}}">{{parseDate(row.id, row.input_time, row.output_time)}}</td>
+											<td id="seeAssemblyTaskResultButton" ng-click="seeAssemblyTaskResult(row.id)" title="{{'SEE_RESULT_TITLE' | translate}}"><img ng-src="pict/open.png" /></td>
+											<td id="downloadAssemblyTaskResultButton" ng-click="downloadAssemblyTaskResult(row.id)" title="{{'DOWNLOAD_RESULT_TITLE' | translate}}"><img ng-src="pict/download.png" /></td>
+											<td id="breakTaskButton" ng-click="breakTask(row.id)" title="{{'BREAK_TASK_TITLE' | translate}}"><img ng-src="pict/stop.png" /></td>
+											<td id="deleteTaskButton" ng-click="deleteTask(row)" title="{{'DELETE_TASK_TITLE' | translate}}"><img ng-src="pict/delete.png" /></td>
+											<td><button id="updateTaskButton" ng-click="update(row)" ng-disabled="addVar" title="{{'UPDATE_TASK_TITLE' | translate}}">{{'UPDATE' | translate}}</button></td>
+											<td><progress value={{row.progress}}>{{'PLEASE_WAIT' | translate}}...</progress></td>
+											<td id="taskState{{row.id}}" title="{{row.state + '_TITLE' | translate}}">{{row.state | translate}}</td>
+			</tr>
+		</table>
+		<br><br><br>
+	</div>
+</div>

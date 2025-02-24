@@ -1,0 +1,199 @@
+<!--
+	@file alignment.html
+	@brief the AngularJS partial 'alignment'
+-->
+
+<h1>DnaAssembler - {{'ALIGNMENT' | translate}}</h1><br>
+
+<div ng-controller='alignmentController'>
+	<ul ng-controller='userAlignmentController'>
+		<li id="alignCircularGenome"><h2>{{'ALIGN_GENOME' | translate}}</h2></li><br>
+
+		<div id="alignSequencePageColumns">
+			<div id="left_col_align_seq">
+				<br>
+				<table>
+					<tr>
+						<td>{{'TASK_NAME' | translate}}:</td>
+						<td><input type="text" id="newAlignTaskName" ng-model="newAlignTaskName" class="center" title="{{'TASK_NAME_TITLE' | translate}}"></td>
+					</tr>
+					<tr>
+						<td>{{'GAP_PENALTY' | translate}}:</td>
+						<td><input type="text" id="gapPenalty" ng-model="gapPenalty" class="center" size="2" title="{{'GAP_PENALTY_TITLE' | translate}}"></td>
+					</tr>
+					<tr>
+						<td>{{'SEQUENCE_FILE' | translate}}:</td>
+						<td>
+							<div ng-controller="userFilesController">
+								<select id="sequenceFile" ng-model="sequenceFile" name="sequenceFile" title="{{'SEQUENCE_FILE_TITLE' | translate}}">
+									<option id="sequenceFile_option_no_input" value="">{{'NO_INPUT' | translate}}</option>
+									<option id="sequenceFile_option_{{file.file_name}}" value="{{file.file_name}}" ng-model="file" ng-repeat="file in user_files_fasta">{{file.file_name}}</option>
+								</select>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td>{{'REFERENCE_FILE' | translate}}:</td>
+						<td>
+							<div ng-controller="userFilesController">
+								<select id="referenceFile" ng-model="referenceFile" name="referenceFile" title="{{'REFERENCE_FILE_TITLE' | translate}}">
+									<option id="referenceFile_option_no_input" value="">{{'NO_INPUT' | translate}}</option>
+									<option id="referenceFile_option_{{file.file_name}}" value="{{file.file_name}}" ng-model="file" ng-repeat="file in user_files_fasta">{{file.file_name}}</option>
+								</select>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td>{{'ALIGN_ALGORITHM' | translate}}:</td>
+						<td>
+							<select id="alignAlgorithmSelect" name="alignAlgorithmSelect" title="{{'ALIGN_ALGORITHM_TITLE' | translate}}">
+								<option id="alignAlgorithm_hirschberg" value="h">{{'HIRSCHBERG' | translate}}</option>
+								<option id="alignAlgorithm_needleman_wunsch" value="nw">{{'NEEDLEMAN_WUNSCH' | translate}}</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>{{'CIRCULAR' | translate}}:</td>
+						<td><input type="checkbox" id="circularCheckbox" name="circularCheckbox" title="{{'CIRCULAR_TITLE' | translate}}"/></td>
+					</tr>
+					<tr>
+						<td>{{'MAIL_NOTIFICATION' | translate}}:</td>
+						<td><input type="checkbox" id="alignResultNotificationCheckbox" name="alignResultNotificationCheckbox" ng-model="alignResultNotificationCheckbox" title="{{'MAIL_NOTIFICATION_TITLE' | translate}}"/></td>
+					</tr>
+					<tr ng-show="alignResultNotificationCheckbox">
+						<td>{{'EMAIL_ADDRESS_SMALL' | translate}}:</td>
+						<td><input type="text" id="alignMailAddress" name="alignMailAddress" ng-model="alignMailAddress" title="{{'EMAIL_ADDRESS_TITLE' | translate}}"/></td>
+					</tr>
+					<tr>
+						<td>{{'SHOW_RESULT_URL' | translate}}:</td>
+						<td><input type="checkbox" id="alignShowResultUrlCheckbox" name="alignShowResultUrlCheckbox" title="{{'SHOW_RESULT_URL_TITLE' | translate}}"/></td>
+					</tr>
+					<tr><td> </td><td> </td></tr>
+					<tr><td> </td><td> </td></tr>
+					<tr><td> </td><td> </td></tr>
+					<tr><td></td><td></td></tr>
+					<tr><td></td><td></td></tr>
+					<tr>
+						<td><button id="alignButton" ng-click="align()" title="{{'ALIGN_TITLE' | translate}}">{{'ALIGN' | translate}}!</button></td>
+						<td></td>
+					</tr>
+				</table>
+			
+			</div>
+
+			<div id="right_col_align_seq">
+				<table>
+					<tr>
+						<td></td>
+						<td class="center">A</td>
+						<td class="center">C</td>
+						<td class="center">T</td>
+						<td class="center">G</td>
+					</tr>
+					<tr>
+						<td>A</td>
+						<td><input type="text" id="AA" ng-model="AA" class="center" size="2"></td>
+						<td><input type="text" id="AC" ng-model="AC" class="center" size="2"></td>
+						<td><input type="text" id="AG" ng-model="AG" class="center" size="2"></td>
+						<td><input type="text" id="AT" ng-model="AT" class="center" size="2"></td>
+					</tr>
+					<tr>
+						<td>C</td>
+						<td><input type="text" id="CA" ng-model="CA" class="center" size="2"></td>
+						<td><input type="text" id="CC" ng-model="CC" class="center" size="2"></td>
+						<td><input type="text" id="CG" ng-model="CG" class="center" size="2"></td>
+						<td><input type="text" id="CT" ng-model="CT" class="center" size="2"></td>
+					</tr>
+					<tr>
+						<td>G</td>
+						<td><input type="text" id="GA" ng-model="GA" class="center" size="2"></td>
+						<td><input type="text" id="GC" ng-model="GC" class="center" size="2"></td>
+						<td><input type="text" id="GG" ng-model="GG" class="center" size="2"></td>
+						<td><input type="text" id="GT" ng-model="GT" class="center" size="2"></td>
+					</tr>
+					<tr>
+						<td>T</td>
+						<td><input type="text" id="TA" ng-model="TA" class="center" size="2"></td>
+						<td><input type="text" id="TC" ng-model="TC" class="center" size="2"></td>
+						<td><input type="text" id="TG" ng-model="TG" class="center" size="2"></td>
+						<td><input type="text" id="TT" ng-model="TT" class="center" size="2"></td>
+					</tr>
+				</table>
+				<br><br><br>
+			</div>
+		</div>
+
+		<br><br><br><br><br><br><br><br><br><br><br>
+
+		<table class="taskTable">
+			<tr>
+				<th>{{'ID' | translate}}</th>
+				<th>{{'TASK_NAME' | translate}}</th>
+				<th>{{'SEQUENCE_FILE_NAME' | translate}}</th>
+				<th>{{'REFERENCE_FILE_NAME' | translate}}</th>
+				<th>{{'ALIGN_ALGORITHM' | translate}}</th>
+				<th>{{'CIRCULAR' | translate}}</th>
+				<th>{{'GAP_PENALTY' | translate}}</th>
+				<th>AA</th>
+				<th>AC</th>
+				<th>AG</th>
+				<th>AT</th>
+				<th>CA</th>
+				<th>CC</th>
+				<th>CG</th>
+				<th>CT</th>
+				<th>GA</th>
+				<th>GC</th>
+				<th>GG</th>
+				<th>GT</th>
+				<th>TA</th>
+				<th>TC</th>
+				<th>TG</th>
+				<th>TT</th>
+
+				<th>{{'INPUT_TIME' | translate}}</th>
+				<th>{{'OUTPUT_TIME' | translate}}</th> 
+				<th>{{'SEE_RESULT' | translate}}</th>
+				<th>{{'DOWNLOAD_RESULT' | translate}}</th>
+				<th>{{'BREAK' | translate}}</th>
+				<th>{{'DELETE' | translate}}</th>  
+				<!--<th></th>--> 
+				<th></th>
+				<th></th>
+			</tr>
+			<tr ng-model="task" ng-repeat="task in user_align_tasks" class="center">
+				<td>{{task.id}}</td>
+				<td>{{task.name}}</td>
+				<td>{{task.sequence_file_name}}</td>
+				<td>{{task.reference_file_name}}</td>
+				<td>{{task.align_algorithm}}</td>
+				<td>{{task.circular}}</td>
+				<td>{{task.gap_penalty}}</td>
+				<td>{{task.AA}}</td>
+				<td>{{task.AC}}</td>
+				<td>{{task.AG}}</td>
+				<td>{{task.AT}}</td>
+				<td>{{task.CA}}</td>
+				<td>{{task.CC}}</td>
+				<td>{{task.CG}}</td>
+				<td>{{task.CT}}</td>
+				<td>{{task.GA}}</td>
+				<td>{{task.GC}}</td>
+				<td>{{task.GG}}</td>
+				<td>{{task.GT}}</td>
+				<td>{{task.TA}}</td>
+				<td>{{task.TC}}</td>
+				<td>{{task.TG}}</td>
+				<td>{{task.TT}}</td>
+				<td id="alignTask_inputTime{{task.id}}"></td>
+				<td id="alignTask_outputTime{{task.id}}">{{parseDate(task.id, task.input_time, task.output_time)}}</td>
+				<td id="seeAlignTaskResultButton" ng-click="seeAlignTaskResult(task.id)" title="{{'SEE_RESULT_TITLE' | translate}}"><img ng-src="pict/open.png" /></td>
+				<td id="downloadAlignTaskResultButton" ng-click="downloadAlignTaskResult(task.id)" title="{{'DOWNLOAD_RESULT_TITLE' | translate}}"><img ng-src="pict/download.png" /></td>
+				<td id="breakAlignTaskButton" ng-click="breakAlignTask(task.id)" title="{{'BREAK_TASK_TITLE' | translate}}"><img ng-src="pict/stop.png" /></td>
+				<td id="deleteAlignTaskButton" ng-click="deleteAlignTask(task)" title="{{'DELETE_TASK_TITLE' | translate}}"><img ng-src="pict/delete.png" /></td>
+				<td><progress value={{task.progress}}>{{'PLEASE_WAIT' | translate}}...</progress></td>
+				<td title="{{task.state + '_TITLE' | translate}}">{{task.state | translate}}</td>
+			</tr>
+		</table>
+	</ul>
+</div>

@@ -1,0 +1,61 @@
+# -*- mode: Python; -*-
+import platform, os
+
+Import('env')
+Import('shared_lib_path')
+Import('MAX_KMER_LENGTH')
+
+#---- --------------------------------------------------------------------------
+# build De Bruijn shared library
+#------------------------------------------------------------------------------
+
+lib_name = 'dnaasm_dbj'
+
+env_dll = env.Clone()
+
+if(platform.system() == "Linux"):
+   env_dll.Prepend( LIBS = [ 'boost_thread' ] )
+
+elif(platform.system() == "Darwin"):
+   env_dll.Prepend( LIBS = [ 'dnaasm_common', 'boost_thread-mt', 'boost_system-mt' ])
+
+elif(platform.system() == "Windows"):
+   env_dll.Append( CPPFLAGS = ' /D "CALC_EXPORTS" /W4 ' )
+   env_dll.Prepend( LIBS = [ 'dnaasm_common' ] )
+
+else:
+   print(platform.system() + " not supported")
+
+env_dll.Append( CPPDEFINES=['MAX_KMER_LENGTH='+MAX_KMER_LENGTH] )
+
+dbj_lib = env_dll.SharedLibrary(
+    target = os.path.join(shared_lib_path, lib_name),
+    source = [
+        'assembly.cpp',
+        'AssemblyParameters.cpp',
+        'AlignParameters.cpp',
+        #'DnaSequenceRepresentationConverter.cpp',
+        'HashTableMultipleValue.cpp',
+        #'HashTable.cpp',
+        #'HashTableKeyHash.cpp',
+        #'HashTableKeyEqual.cpp',
+        'OutputVCF.cpp',
+        'SingleGraph.cpp',
+        'Statistics.cpp',
+        'SequenceAlignment.cpp',
+        'Mismatch.cpp',
+        'HirschbergAlgorithm.cpp',
+        'NeedlemanWunschAlgorithm.cpp',
+        'SingleGraphBuilder.cpp',
+        'UnitigsToContigsExtension.cpp',
+        'ContigsToScaffoldsExtension.cpp',
+        'globals.cpp',
+        'RemoveTips.cpp',
+        'RemoveLowCounterEdges.cpp',
+        'DistanceEstimator.cpp',
+        'CalcMaxGapSize.cpp',
+        'KMerCounter.cpp',
+        'JoinExtendedSequences.cpp'
+    ])
+
+Return('dbj_lib')

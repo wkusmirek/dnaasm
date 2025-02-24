@@ -1,0 +1,39 @@
+# -*- mode: Python; -*-
+import platform, os
+
+Import('env')
+Import('shared_lib_path')
+Import('UNIX_SYSTEM')
+
+#------------------------------------------------------------------------------
+# build Blast shared library
+#------------------------------------------------------------------------------
+
+lib_name = 'dnaasm_bst'
+
+env_dll = env.Clone()
+
+if(UNIX_SYSTEM):
+   env_dll.Prepend( LIBS = [ 'boost_system', 'dnaasm_common' ] )
+
+elif(platform.system() == "Windows"):
+   env_dll.Append( CPPFLAGS = ' /D "CALC_EXPORTS" /W4 ' )
+   env_dll.Prepend( LIBS = [ 'dnaasm_common' ] )
+
+else:
+   print(platform.system() + " not supported")
+
+bst_lib = env_dll.SharedLibrary(
+   target = os.path.join(shared_lib_path, lib_name),
+   source = [
+      'BstParameters.cpp',
+      'Blast.cpp',
+      'Word.cpp',
+      'WordAssoc.cpp',
+      'Chainer.cpp',
+      'GraphBuilder.cpp',
+      'AssemblyManager.cpp',
+      'Consensus.cpp',
+   ])
+
+Return('bst_lib')

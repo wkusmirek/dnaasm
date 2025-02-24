@@ -1,0 +1,177 @@
+# -*- mode: Python; -*-
+import platform, shutil, os
+
+Import('DNAASM_VER_MAJOR DNAASM_VER_MINOR DNAASM_VER_COMPILATION DNAASM_VER_INSTALL')
+Import('BOOST_INCLUDE_WINDOWS  BOOST_LIB_WINDOWS  PYTHON_INCLUDE_WINDOWS  PYTHON_LIB_WINDOWS MT4CPP_INCLUDE_WINDOWS')
+Import('BOOST_INCLUDE_LINUX  BOOST_LIB_LINUX  PYTHON_INCLUDE_LINUX  PYTHON_LIB_LINUX MT4CPP_INCLUDE_LINUX')
+Import('MAX_KMER_LENGTH LOG_CPP_LOC')
+Import('DEBUG_FLAG')
+Import('COVERAGE_FLAG')
+Import('UNIX_SYSTEM')
+
+print('Cpp builder, library version {0}.{1}.{2}'.format(DNAASM_VER_MAJOR, DNAASM_VER_MINOR, DNAASM_VER_COMPILATION))
+
+def copyLibBuilder( target, source, env):
+   '''kopiuje biblioteke'''
+   shutil.copy( str(source[0]), str(target[0]) )
+   return
+
+if(platform.system() == 'Darwin'):
+   env = Environment(CC = 'gcc-6', CXX = 'g++-6')
+else:
+   env = Environment(ENV = os.environ)
+
+env.Append( ENV = {'PATH' : os.environ['PATH'] })
+
+#------------------------------------------------------------------------------
+# set up compiler and linker options used by all targets
+#------------------------------------------------------------------------------
+
+shared_lib_path = os.path.dirname(os.path.abspath('__file__'))
+shared_lib_subdir = 'lib'
+
+
+cppflags = ''
+
+if(UNIX_SYSTEM):
+   shared_lib_path = os.path.join(shared_lib_path, shared_lib_subdir)
+   env.Append( CPPPATH = [ Dir(BOOST_INCLUDE_LINUX),
+                           Dir(MT4CPP_INCLUDE_LINUX) ] )
+   env.Append( LIBPATH = [ Dir(BOOST_LIB_LINUX),
+                           Dir(shared_lib_path) ] )
+   cppflags = ' -std=c++14 -Wall -pedantic '
+   if not DEBUG_FLAG and not COVERAGE_FLAG:
+      cppflags += ' -O3 '
+   if DEBUG_FLAG:
+      cppflags += ' -g -DDEBUG '
+   if COVERAGE_FLAG:
+      cppflags += ' -fprofile-arcs -ftest-coverage -fPIC -O0 '
+      env.Append( LIBS = ['gcov'] )
+
+   env.Append( LINKFLAGS = ' -Wall' )
+   env.Append( RPATH = [ Dir(BOOST_LIB_LINUX),
+                         shared_lib_subdir ] )
+
+elif(platform.system() == "Windows"):
+   env.Append( CPPPATH = [ Dir(BOOST_INCLUDE_WINDOWS),
+                           Dir(MT4CPP_INCLUDE_WINDOWS) ] )
+   env.Append( LIBPATH = [ Dir(BOOST_LIB_WINDOWS),
+                           Dir(shared_lib_path)] )
+   #there is no RPATH on Windows OS
+   #env.Append( RPATH = [Dir(BOOST_LIB_WINDOWS),
+                       #Dir(shared_lib_subdir) ])
+   cppflags = ' /EHsc /MD /D "WIN32" /D "_CONSOLE" /W4 '
+   linkflags = ' /SUBSYSTEM:CONSOLE '
+   if DEBUG_FLAG:
+      cppflags += ' /DDEBUG /ZI /FS'
+      linkflags += '/DEBUG '
+   else:
+      cppflags += ' /O2'
+
+   env.Append( LINKFLAGS = linkflags )
+   env.Append( WINDOWS_INSERT_MANIFEST = True )
+else:
+   print(platform.system() + " not supported")
+
+env.Append( CPPFLAGS = cppflags )
+
+#------------------------------------------------------------------------------
+# build shared libraries
+#------------------------------------------------------------------------------
+common_lib = SConscript('src/common/SConscript', exports=['env', 'shared_lib_path', 'LOG_CPP_LOC', 'MAX_KMER_LENGTH'])
+dbj_lib = SConscript('src/dbj/SConscript', exports=['env',  'shared_lib_path', 'MAX_KMER_LENGTH'])
+olc_lib = SConscript('src/olc/SConscript', exports=['env',  'shared_lib_path'])
+scfr_lib = SConscript('src/scfr/SConscript', exports=['env', 'shared_lib_path'])
+bst_lib = SConscript('src/bst/SConscript', exports=['env', 'shared_lib_path'])
+dnaasm_lib = SConscript('src/dnaasm/SConscript', exports=['env', 'shared_lib_path'])
+
+#------------------------------------------------------------------------------
+# build Dnaasm executable
+#------------------------------------------------------------------------------
+
+env_app = env.Clone()
+env_app.Append( CPPDEFINES=['MAX_KMER_LENGTH='+MAX_KMER_LENGTH] )
+
+if(platform.system() == "Linux"):
+   env_app.Prepend( LIBS = ['dnaasm_dbj', 'dnaasm_bst', 'dnaasm_common', 'dnaasm_olc', 'dnaasm_scfr', 'dnaasm', 'boost_system', 'boost_thread'] )
+elif(platform.system() == "Darwin"):
+   env_app.Prepend( LIBS = ['dnaasm_dbj', 'dnaasm_bst', 'dnaasm_common', 'dnaasm_olc', 'dnaasm_scfr', 'dnaasm', 'boost_log', 'boost_thread-mt', 'boost_system', 'boost_regex'])
+elif(platform.system() == "Windows"):
+   env_app.Prepend( LIBS = ['dnaasm_dbj', 'dnaasm_bst', 'dnaasm_common', 'dnaasm_olc', 'dnaasm_scfr', 'dnaasm'])
+else:
+   print(platform.system() + " not supported")
+
+dnaasm_exec = env_app.Program( target = 'dnaasm', source = ['src/dnaasm_main.cpp'])
+Requires(dnaasm_exec, dnaasm_lib)
+Requires(dnaasm_exec, common_lib)
+Requires(dnaasm_exec, dbj_lib)
+Requires(dnaasm_exec, olc_lib)
+Requires(dnaasm_exec, scfr_lib)
+
+#------------------------------------------------------------------------------
+# build Blast executable - for early development purpose (only for Darwin)
+#------------------------------------------------------------------------------
+
+env_app_bst = env.Clone()
+
+if(platform.system() == "Darwin"):
+   env_app_bst.Prepend( LIBS = ['dnaasm_bst', 'dnaasm_common', 'boost_system'] )
+
+   blast_exec = env_app_bst.Program( target = '../blast', source = ['src/bst/blast_main.cpp'])
+
+   Requires(blast_exec, common_lib)
+
+#------------------------------------------------------------------------------
+# build Boost::Python shared library
+#------------------------------------------------------------------------------
+env_python = env.Clone()
+
+if(UNIX_SYSTEM):
+   env_python.Append( CPPPATH = [ Dir(PYTHON_INCLUDE_LINUX) ] )
+   env_python.Append( LIBPATH = [ Dir(PYTHON_LIB_LINUX) ] )
+   env_python.Prepend( RPATH = ['..'] )
+
+   if(platform.system() == "Linux"):
+      env_python.Prepend( LIBS = [ 'dnaasm', 'boost_log', 'boost_python3', 'boost_regex' ] )
+   else:
+      env_python.Prepend( LIBS = [ 'dnaasm_common', 'dnaasm', 'boost_log', 'boost_thread-mt','boost_system', 'python3.6', 'boost_python3', 'boost_regex' ] )
+
+elif(platform.system() == "Windows"):
+   env_python.Append( CPPPATH = [ Dir(PYTHON_INCLUDE_WINDOWS) ] )
+   env_python.Append( LIBPATH = [ Dir(PYTHON_LIB_WINDOWS),
+                                  Dir('.') ] )
+   env_python.Prepend( LIBS = [ 'dnaasm_common', 'dnaasm' ] )
+
+else:
+   print(platform.system() + " not supported")
+
+env_python.Append( CPPDEFINES=['MAX_KMER_LENGTH='+MAX_KMER_LENGTH] )
+
+pythonlib = env_python.SharedLibrary( target = 'lib/dnaasmpy', source = ['src/dnaasmpy.cpp'])
+Requires(pythonlib, dbj_lib)
+Requires(pythonlib, olc_lib)
+Requires(pythonlib, scfr_lib)
+Requires(pythonlib, dnaasm_lib)
+
+if(UNIX_SYSTEM):
+   target = '../build_web/dnaasmpy/dnaasmpy.so'
+elif(platform.system() == "Windows"):
+   target = '../build_web/dnaasmpy/dnaasmpy.pyd'
+env_python.Command(target, pythonlib, copyLibBuilder )
+
+
+#------------------------------------------------------------------------------
+# build test executables
+#------------------------------------------------------------------------------
+SConscript('tests/SConscript',
+           exports=[
+               'env',
+               'copyLibBuilder',
+               'dbj_lib',
+               'olc_lib',
+               'scfr_lib',
+               'bst_lib',
+               'common_lib',
+               'dnaasm_lib',
+               'MAX_KMER_LENGTH'
+           ])

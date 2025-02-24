@@ -1,0 +1,98 @@
+<!--
+	@file all_files.html
+	@brief the AngularJS partial 'all_files'
+-->
+
+<h1>DnaAssembler - {{'ALL_FILES' | translate}}</h1><br>
+
+<div ng-controller="filesController">
+	<div ng-controller="allFilesController">
+		<ul>
+			<li id="fastaFiles"><h2>{{'FASTA_FILES' | translate}}</h3></li><br>
+			<table class="greyTable">
+				<tr>
+					<th>{{'FILE_NAME' | translate}}</th>
+					<th>{{'OWNER_BIG' | translate}}</th>
+					<th>{{'UPLOAD_FILE_TIME' | translate}}</th>
+					<th>{{'DELETE_FILE' | translate}}</th>
+					<th>{{'SEE_FILE_CONTENTS' | translate}}</th>
+					<th>{{'DOWNLOAD_FILE' | translate}}</th>
+				</tr>
+				<tr ng-model="row" ng-repeat="row in all_files_fasta">
+					<td>{{row.file_name}}</td>
+					<td>{{row.owner}}</td>
+					<td id="inputTime_{{row.docfile}}">{{parseDate(row.docfile, row.input_time)}}</td>
+					<td id="deleteFileButton_{{row.docfile}}" ng-click="deleteFile(row.docfile)" title="{{'DELETE_FILE_TITLE' | translate}}"><img ng-src="pict/delete.png" /></td>
+					<td id="seeFileContentsButton_{{row.docfile}}" ng-click="seeFileContents(row.docfile, false)" title="{{'SEE_FILE_CONTENTS_TITLE' | translate}}"><img ng-src="pict/open.png" /></td>
+					<td id="downloadFileButton_{{row.docfile}}" ng-click="downloadFile(row.docfile, row.file_name)" title="{{'DOWNLOAD_FILE_TITLE' | translate}}"><img ng-src="pict/download.png" /></td>
+					<td id="downloadProgress_{{row.docfile}}"></td>
+				</tr> 
+			</table><br><br>
+
+			<li id="fastqFiles"><h2>{{'FASTQ_FILES' | translate}}</h3></li><br>
+			<table class="greyTable">
+				<tr>
+					<th>{{'FILE_NAME' | translate}}</th>
+					<th>{{'OWNER_BIG' | translate}}</th>
+					<th>{{'UPLOAD_FILE_TIME' | translate}}</th>
+					<th>{{'DELETE_FILE' | translate}}</th>
+					<th>{{'SEE_FILE_CONTENTS' | translate}}</th>
+					<th>{{'DOWNLOAD_FILE' | translate}}</th>
+				</tr>
+				<tr ng-model="row" ng-repeat="row in all_files_fastq">
+					<td>{{row.file_name}}</td>
+					<td>{{row.owner}}</td>
+					<td id="inputTime_{{row.docfile}}">{{parseDate(row.docfile, row.input_time)}}</td>
+					<td id="deleteFileButton_{{row.docfile}}" ng-click="deleteFile(row.docfile)" title="{{'DELETE_FILE_TITLE' | translate}}"><img ng-src="pict/delete.png" /></td>
+					<td id="seeFileContentsButton_{{row.docfile}}" ng-click="seeFileContents(row.docfile, false)" title="{{'SEE_FILE_CONTENTS_TITLE' | translate}}"><img ng-src="pict/open.png" /></td>
+					<td id="downloadFileButton_{{row.docfile}}" ng-click="downloadFile(row.docfile, row.file_name)" title="{{'DOWNLOAD_FILE_TITLE' | translate}}"><img ng-src="pict/download.png" /></td>
+					<td id="downloadProgress_{{row.docfile}}"></td>
+				</tr> 
+			</table><br><br>
+
+			<li id="vcfFiles"><h2>{{'VCF_FILES' | translate}}</h3></li><br>
+			<table class="greyTable">
+				<tr>
+					<th>{{'FILE_NAME' | translate}}</th>
+					<th>{{'OWNER_BIG' | translate}}</th>
+					<th>{{'UPLOAD_FILE_TIME' | translate}}</th>
+					<th>{{'DELETE_FILE' | translate}}</th>
+					<th>{{'SEE_FILE_CONTENTS' | translate}}</th>
+					<th>{{'DOWNLOAD_FILE' | translate}}</th>
+				</tr>
+				<tr ng-model="row" ng-repeat="row in all_files_vcf">
+					<td>{{row.file_name}}</td>
+					<td>{{row.owner}}</td>
+					<td id="inputTime_{{row.docfile}}">{{parseDate(row.docfile, row.input_time)}}</td>
+					<td id="deleteFileButton_{{row.docfile}}" ng-click="deleteFile(row.docfile)" title="{{'DELETE_FILE_TITLE' | translate}}"><img ng-src="pict/delete.png" /></td>
+					<td id="seeFileContentsButton_{{row.docfile}}" ng-click="seeFileContents(row.docfile, true)" title="{{'SEE_FILE_CONTENTS_TITLE' | translate}}"><img ng-src="pict/open.png" /></td>
+					<td id="downloadFileButton_{{row.docfile}}" ng-click="downloadFile(row.docfile, row.file_name)" title="{{'DOWNLOAD_FILE_TITLE' | translate}}"><img ng-src="pict/download.png" /></td>
+					<td id="downloadProgress_{{row.docfile}}"></td>
+				</tr> 
+			</table><br><br>
+
+			<li id="unknownFiles"><h2>{{'UNKNOWN_FILES' | translate}}</h3></li><br>
+			<table class="greyTable">
+				<tr>
+					<th>{{'FILE_NAME' | translate}}</th>
+					<th>{{'OWNER_BIG' | translate}}</th>
+					<th>{{'UPLOAD_FILE_TIME' | translate}}</th>
+					<th>{{'DELETE_FILE' | translate}}</th>
+					<th>{{'SEE_FILE_CONTENTS' | translate}}</th>
+					<th>{{'DOWNLOAD_FILE' | translate}}</th>
+				</tr>
+				<tr ng-model="row" ng-repeat="row in all_files_unknown">
+					<td>{{row.file_name}}</td>
+					<td>{{row.owner}}</td>
+					<td id="inputTime_{{row.docfile}}">{{parseDate(row.docfile, row.input_time)}}</td>
+					<td id="deleteFileButton_{{row.docfile}}" ng-click="deleteFile(row.docfile)" title="{{'DELETE_FILE_TITLE' | translate}}"><img ng-src="pict/delete.png" /></td>
+					<td id="seeFileContentsButton_{{row.docfile}}" ng-click="seeFileContents(row.docfile, false)" title="{{'SEE_FILE_CONTENTS_TITLE' | translate}}"><img ng-src="pict/open.png" /></td>
+					<td id="downloadFileButton_{{row.docfile}}" ng-click="downloadFile(row.docfile, row.file_name)" title="{{'DOWNLOAD_FILE_TITLE' | translate}}"><img ng-src="pict/download.png" /></td>
+					<td id="downloadProgress_{{row.docfile}}"></td>
+				</tr> 
+			</table>
+
+		</ul>
+		<br><br><br>
+	</div>
+</div>

@@ -1,0 +1,14 @@
+scons
+pywin32
+flup6
+Django
+waitress
+splinter
+selenium
+psycopg2
+coverage
+django-jenkins
+pyflakes
+pylint
+cpplint
+unittest-xml-reporting

@@ -1,0 +1,30 @@
+<!--
+    @file assembling.html
+    @brief the AngularJS partial 'assembling'
+-->
+
+<h1>DnaAssembler - {{'ASSEMBLING' | translate}}</h1><br>
+
+<div ng-controller="mainController">
+        <select name="assemblyModeSelect"
+                id="assemblyModeSelect" ng-model="data.selectedAssemblyMode"
+                                        ng-init="data.selectedAssemblyMode = data.availableAssemblyModes[0].id">
+
+            <option ng-repeat="option in data.availableAssemblyModes" value="{{option.id}}">{{option.name | translate}}</option>
+        </select>
+        <br>
+        <br>
+        <div ng-switch="data.selectedAssemblyMode">
+            <div id="short_reads_assembling" ng-switch-when="short_reads_assembling">
+                <ng-include src="'/views/short_reads_assembling.html'"></ng-include>
+            </div>
+
+            <div id="long_reads_assembling" ng-switch-when="long_reads_assembling">
+                <ng-include src="'/views/long_reads_assembling.html'"></ng-include>
+            </div>
+
+            <div id="long_reads_assembling_2" ng-switch-when="long_reads_assembling_2">
+                <ng-include src="'/views/long_reads_assembling_2.html'"></ng-include>
+            </div>
+        </div>
+</div>

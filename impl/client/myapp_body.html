@@ -1,0 +1,55 @@
+<!-- this file contains sections included during build into html body of test and static html page" -->
+
+<div ng-controller="exitController">
+
+	<div class="upperBeam">
+
+		<div ng-controller="languagesController">
+			<ul id="right_icons_ul">
+				<li ng-repeat="lang in langs">
+					<a id="a_lang_{{lang}}" ng-click="changeLanguage(lang)" title="{{lang + '_TITLE' | translate}}"><img ng-src="pict/{{lang}}.png" /></a>
+				</li>
+			</ul>
+		</div>
+
+		<div ng-controller="loginController">
+			<ul id="right_icons_ul">
+				<li><button class="upperBeamButton" id="showNewUserWindowButton" type="button" ng-hide="isUserLoggedIn()" ng-click="newUserWindow()" title="{{'ADD_USER_TITLE' | translate}}">{{'ADD_USER' | translate}}</button></li>
+				<li><button class="upperBeamButton" id="showLoginWindowButton" type="button" ng-hide="isUserLoggedIn()" ng-click="loginWindow()" title="{{'LOG_IN_TITLE' | translate}}">{{'LOG_IN' | translate}}</button></li>
+				<li><button class="upperBeamButton" id="loginAsGuestButton" type="button" ng-hide="isUserLoggedIn()" ng-click="loginAsGuest()" title="{{'LOG_IN_AS_GUEST_TITLE' | translate}}">{{'LOG_IN_AS_GUEST' | translate}}</button></li>
+				<li><button class="upperBeamButton" id="logoutButton" type="button" ng-show="isUserLoggedIn()" ng-click="logOff()" title="{{'LOG_OFF_TITLE' | translate}}">{{'LOG_OFF' | translate}}</button></li>
+				<li><a id="userSettingsButton" type="button" ng-show="isUserLoggedIn()" ng-click="userSettingsWindow()" title="{{'USER_SETTINGS_TITLE' | translate}}"><img ng-src="pict/user.png" /></a></li>
+				<li><span ng-show="isUserLoggedIn()">{{'LOGGED_IN_AS' | translate}}: {{username}}</span></li>
+			</ul>
+		</div>
+
+		<div ng-controller="helpPageController">
+			<ul id="left_icons_ul">
+				<li><button class="upperBeamButton" id="showHelpWindowButton" type="button" ng-click="openHelpWindow()" title="{{'HELP_TITLE' | translate}}">{{'HELP' | translate}}</button></li>
+			</ul>
+		</div>
+
+		<br>
+		<br>
+
+		<div class="tabs" ng-controller="tabsController">
+			<span ng-show="isUserLoggedIn()">
+				<ul id="user_tabs_ul">
+					<li id="user_tabs_li" ng-repeat="user_tab in user_tabs" ng-class="{active:isActiveTab(user_tab.url)}" ng-click="onClickTab(user_tab)">
+						<a id="a_user_tab_{{user_tab.title}}" title="{{user_tab.title + '_TITLE' | translate}}">{{user_tab.title | translate}}</a>
+					</li>
+				</ul>
+				<ul id="admin_tabs_ul" ng-if="isSuperuser()">
+					<li id="admin_tabs_li" ng-repeat="admin_tab in admin_tabs" ng-class="{active:isActiveTab(admin_tab.url)}" ng-click="onClickTab(admin_tab)">
+						<a id="a_admin_tab_{{admin_tab.title}}" title="{{admin_tab.title + '_TITLE' | translate}}">{{admin_tab.title | translate}}</a>
+					</li>
+				</ul>
+			</span>
+		</div>
+
+	</div>
+
+	<div id="content" class="container" ng-view>
+	</div>
+
+</div>

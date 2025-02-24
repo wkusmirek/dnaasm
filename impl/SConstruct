@@ -1,0 +1,341 @@
+# -*- mode: Python; -*-
+import os, platform, subprocess, re, time, shutil, sys, signal, fileinput
+
+if sys.version_info < (3, 0):
+    from ConfigParser import ConfigParser
+else:
+    from configparser import ConfigParser
+
+DNAASM_NAME = 'dnaasm'
+
+DNAASM_VER_MAJOR = '0'
+DNAASM_VER_MINOR = '07'
+DNAASM_VER_COMPILATION = '0'
+DNAASM_VER_INSTALL = '1'
+
+#odczytuje wersje kompilacji z wersji repozytorium
+ver_repository = subprocess.Popen('hg sum', shell=True, stdout=subprocess.PIPE).communicate()[0]
+try:
+    DNAASM_VER_COMPILATION = re.search('(?<=parent: )\d+', ver_repository).group()
+except BaseException:
+    pass
+
+DNAASM_VER_STRING = str(DNAASM_VER_MAJOR) + '.' + str(DNAASM_VER_MINOR) + '.' + DNAASM_VER_COMPILATION
+UNIX_SYSTEM = platform.system() in ['Linux', 'Darwin']
+
+config = ConfigParser()
+config.read('build_custom.ini')
+
+#boost version
+BOOST_VER_MAJOR = config.get('cpp','BOOST_VER_MAJOR')
+BOOST_VER_MINOR = config.get('cpp','BOOST_VER_MINOR')
+
+#lib and include paths
+BOOST_INCLUDE_WINDOWS = config.get('cpp','BOOST_INCLUDE_WINDOWS')
+BOOST_LIB_WINDOWS = config.get('cpp','BOOST_LIB_WINDOWS')
+PYTHON_INCLUDE_WINDOWS = config.get('cpp','PYTHON_INCLUDE_WINDOWS')
+PYTHON_LIB_WINDOWS = config.get('cpp','PYTHON_LIB_WINDOWS')
+MT4CPP_INCLUDE_WINDOWS = config.get('cpp','MT4CPP_INCLUDE_WINDOWS')
+BOOST_INCLUDE_LINUX = config.get('cpp','BOOST_INCLUDE_LINUX')
+BOOST_LIB_LINUX = config.get('cpp','BOOST_LIB_LINUX')
+PYTHON_INCLUDE_LINUX = config.get('cpp','PYTHON_INCLUDE_LINUX')
+PYTHON_LIB_LINUX = config.get('cpp','PYTHON_LIB_LINUX')
+MT4CPP_INCLUDE_LINUX = config.get('cpp','MT4CPP_INCLUDE_LINUX')
+
+#browser
+WWW_BROWSER_WINDOWS = config.get('browser','WWW_BROWSER_WINDOWS')
+WWW_BROWSER_LINUX = config.get('browser','WWW_BROWSER_LINUX')
+
+#web
+WEB_SRV_PREFIX = config.get('web','WEB_SRV_PREFIX')
+WEB_SRV_HOST = config.get('web','WEB_SRV_HOST')
+WEB_SRV_PORT = config.get('web','WEB_SRV_PORT')
+WEB_CLIENT_HOST = config.get('web','WEB_CLIENT_HOST')
+WEB_CLIENT_PORT = config.get('web','WEB_CLIENT_PORT')
+
+#functional_tests
+FUNCTIONAL_TEST_LOCAL_ADMIN_USER = config.get('functional_tests','FUNCTIONAL_TEST_LOCAL_ADMIN_USER')
+FUNCTIONAL_TEST_LOCAL_ADMIN_USER_PASSWORD = config.get('functional_tests','FUNCTIONAL_TEST_LOCAL_ADMIN_USER_PASSWORD')
+
+#production
+PRODUCTION_HOST = config.get('web','PRODUCTION_HOST')
+PRODUCTION_PORT = config.get('web','PRODUCTION_PORT')
+
+#log
+LOG_WEB_LOC = config.get('web','LOG_WEB_LOC')
+LOG_FILE_NAME = config.get('web','LOG_FILE_NAME')
+
+#database
+DB_NAME = config.get('database','DB_NAME')
+DB_USER = config.get('database','DB_USER')
+DB_PASSWORD = config.get('database','DB_PASSWORD')
+
+#cpp settings
+MAX_KMER_LENGTH = config.get('cpp','MAX_KMER_LENGTH')
+LOG_CPP_LOC = config.get('cpp','LOG_CPP_LOC')
+
+#build flags
+DEBUG_FLAG = config.get('main','DEBUG') in ['TRUE', 'True', 'true', '1']
+COVERAGE_FLAG = config.get('main','COVERAGE') in ['TRUE', 'True', 'true', '1']
+
+Export('BOOST_INCLUDE_WINDOWS  BOOST_LIB_WINDOWS  PYTHON_INCLUDE_WINDOWS  PYTHON_LIB_WINDOWS MT4CPP_INCLUDE_WINDOWS')
+Export('BOOST_INCLUDE_LINUX  BOOST_LIB_LINUX  PYTHON_INCLUDE_LINUX  PYTHON_LIB_LINUX MT4CPP_INCLUDE_LINUX')
+Export('DNAASM_NAME DNAASM_VER_MAJOR DNAASM_VER_MINOR DNAASM_VER_COMPILATION DNAASM_VER_INSTALL')
+Export('WWW_BROWSER_WINDOWS WWW_BROWSER_LINUX')
+Export('WEB_SRV_PREFIX WEB_SRV_HOST WEB_SRV_PORT WEB_CLIENT_HOST WEB_CLIENT_PORT')
+Export('DB_NAME DB_USER DB_PASSWORD')
+Export('BOOST_VER_MAJOR BOOST_VER_MINOR')
+Export('LOG_WEB_LOC LOG_FILE_NAME')
+Export('PRODUCTION_HOST PRODUCTION_PORT')
+Export('MAX_KMER_LENGTH LOG_CPP_LOC')
+Export('DEBUG_FLAG')
+Export('COVERAGE_FLAG')
+Export('UNIX_SYSTEM')
+
+vars = Variables('custom.py')
+vars.Add(EnumVariable('r','Run the application, l: local lighttpd at \''+ WEB_CLIENT_HOST + ':' + WEB_CLIENT_PORT +'\''\
+                      ', d: django internal at \''+ WEB_CLIENT_HOST + ':' + WEB_CLIENT_PORT +'\'',
+                      'no', allowed_values = ('l', 'd', 'no'), map={}, ignorecase=2) )
+vars.Add(EnumVariable('t','Run the tests, \'w\' Python web unit tests, \'j\' Javascript client unit tests, \'c\' C++ library unit tests, \'f\' local  functional tests, \'p\' functional tests on production, \'b\' blast functional tests, \'v\' build only web',
+                      'no', allowed_values = ('w', 'j', 'c', 'f', 'p', 'b', 'bc', 'v', 'no'), map={}, ignorecase=2) )
+vars.Add(EnumVariable('cov','Run coverage reports, \'w\' Python server, \'c\' C++ library', 'no', allowed_values = ('w', 'c', 'no'), map={}, ignorecase=2) )
+vars.Add(BoolVariable('cpp_style','Set to 1 to test cpp code style',0) )
+vars.Add(BoolVariable('python_style','Set to 1 to test python code style',0) )
+vars.Add(BoolVariable('syncdb','Set to 1 to clean application files and recreate tables in database',0) )
+vars.Add(BoolVariable('install', 'build debian package', 0))
+vars.Add(BoolVariable('docker', 'make docker image', 0))
+vars.Add(BoolVariable('zip','Set to 1 to build zip package',0) )
+vars.Add(BoolVariable('doxygen', 'Set 1 to generate documentation. The file Doxyfile_in is required',0) )
+vars.Add(BoolVariable('create_super_user', 'Set 1 to create super user (admin user)',0) )
+additional_help_text = ""
+
+env = Environment(MSVC_VERSION='14.0', variables=vars)
+#env = Environment(variables=vars)
+
+Help("""
+type 'scons' to build the program and libraries. Settings specific for this project are listed below.
+"""
+     +
+     vars.GenerateHelpText(env)
+     +
+     additional_help_text)
+
+if (UNIX_SYSTEM):
+    WWW_BROWSER = WWW_BROWSER_LINUX
+    BROWSER_CMD = WWW_BROWSER_LINUX + ' http://' + WEB_CLIENT_HOST + ':' + WEB_CLIENT_PORT + ' &'
+    BROWSER_PROD = WWW_BROWSER_LINUX + ' http://' + PRODUCTION_HOST + ':' + PRODUCTION_PORT + ' &'
+else:
+    WWW_BROWSER = WWW_BROWSER_WINDOWS
+    BROWSER_CMD = 'start "" ' + WWW_BROWSER_WINDOWS + ' http://' + WEB_CLIENT_HOST + ':' + WEB_CLIENT_PORT
+    BROWSER_PROD = 'start "" ' + WWW_BROWSER_WINDOWS + ' http://' + PRODUCTION_HOST + ':' + PRODUCTION_PORT
+
+def addToLD(path):
+    if (UNIX_SYSTEM):
+        DYLIB_PATH = "LD_LIBRARY_PATH"
+        if (platform.system() == 'Darwin'):
+            DYLIB_PATH = "DY" + DYLIB_PATH
+
+        if DYLIB_PATH in os.environ:
+            os.environ[DYLIB_PATH]= os.environ[DYLIB_PATH] + ':' + os.path.abspath(path)
+        else:
+            os.environ[DYLIB_PATH]= os.path.abspath(path)
+
+    elif platform.system() == "Windows":
+        if "PATH" in os.environ:
+            os.environ["PATH"]= os.environ["PATH"] + ';' + os.path.abspath(path)
+        else:
+            os.environ["PATH"]= os.path.abspath(path)
+
+if env['r'] == 'l':
+    addToLD('./cpp/lib')
+    os.system(BROWSER_CMD)
+    os.system('lighttpd -f client/lighttpd.develop')
+    if UNIX_SYSTEM:
+        os.system('gunicorn --env DJANGO_SETTINGS_MODULE=config.settings.dev --chdir build_web --timeout 0 --workers 1 --bind \'{addr}:{port}\' wsgi:application'.format(addr=WEB_SRV_HOST, port=WEB_SRV_PORT))
+        os.system('kill `cat client/lighttpd.pid`')
+    elif platform.system() == "Windows":
+        os.system('set DJANGO_SETTINGS_MODULE=config.settings.dev')
+        os.system('cd build_web && waitress-serve --listen=' + WEB_SRV_HOST + ':' + WEB_SRV_PORT + ' wsgi:application')
+        #os.system('python3 build_web/manage.py runfcgi --settings=config.settings.dev daemonize=false method=threaded host=' + WEB_SRV_HOST + ' port=' + WEB_SRV_PORT)
+        os.system('taskkill /F /T /IM lighttpd.exe')
+elif env['r'] == 'd':
+    addToLD('./cpp/lib')
+    os.system(BROWSER_CMD)
+    os.system('python3 build_web/manage.py runserver ' + WEB_CLIENT_HOST + ':' + WEB_CLIENT_PORT + ' --settings=config.settings.dev')
+elif env['t'] == 'w':
+    addToLD('./cpp/lib')
+    os.system('python3 build_web/manage.py makemigrations --settings=config.settings.dev dnaasmpy version current assembly align scaffold user file olc bst')
+    os.system('python3 build_web/manage.py migrate --settings=config.settings.dev')
+    os.system('python3 build_web/manage.py test --settings=config.settings.dev version production current dnaasmpy assembly align scaffold olc bst user file logs mail')
+elif env['t'] == 'j':
+    child_process = subprocess.Popen('python3 client/tests/srv.py ', shell=True, stdout=subprocess.PIPE)
+    os.system( WWW_BROWSER + ' ' + os.getcwd() + ' client/unit_test_out.html --args \'--disable-web-security\'')
+    if(UNIX_SYSTEM):
+        os.system("kill " + str(child_process.pid))
+    else:
+        os.system('taskkill /F /T /PID %d' % child_process.pid)
+elif env['t'] == 'c':
+    if(UNIX_SYSTEM):
+        addToLD('./cpp/lib')
+        print('-------------------------------------\n')
+        print('Running dbj library C++ unit tests...\n')
+        print('-------------------------------------\n')
+        os.system('cpp/dnaasm_dbj_test')
+        print('-------------------------------------\n')
+        print('Running olc library C++ unit tests...\n')
+        print('-------------------------------------\n')
+        os.system('cpp/dnaasm_olc_test')
+        print('-------------------------------------\n')
+        print('Running scfr library C++ unit tests...\n')
+        print('-------------------------------------\n')
+        os.system('cpp/dnaasm_scfr_test')
+        print('-------------------------------------\n')
+        print('Running bst library C++ unit tests...\n')
+        print('-------------------------------------\n')
+        os.system('cpp/dnaasm_bst_test')
+        print('-------------------------------------\n')
+        print('Running dnaasm library C++ unit tests...\n')
+        print('-------------------------------------\n')
+        os.system('cpp/dnaasm_test')
+        print('-------------------------------------\n')
+        print('Running common library C++ unit tests...\n')
+        print('-------------------------------------\n')
+        os.system('cpp/dnaasm_common_test')
+    elif(platform.system() == "Windows"):
+        print('-------------------------------------\n')
+        print('Running dbj library C++ unit tests...\n')
+        print('-------------------------------------\n')
+        os.system('cpp\dnaasm_dbj_test')
+        print('-------------------------------------\n')
+        print('Running olc library C++ unit tests...\n')
+        print('-------------------------------------\n')
+        os.system('cpp\dnaasm_olc_test')
+        print('-------------------------------------\n')
+        print('Running scfr library C++ unit tests...\n')
+        print('-------------------------------------\n')
+        os.system('cpp\dnaasm_scfr_test')
+        print('-------------------------------------\n')
+        print('Running dnaasm library C++ unit tests...\n')
+        print('-------------------------------------\n')
+        os.system('cpp\dnaasm_test')
+        print('-------------------------------------\n')
+        print('Running common library C++ unit tests...\n')
+        print('-------------------------------------\n')
+        os.system('cpp\dnaasm_common_test')
+elif env['t'] == 'f':
+    if(UNIX_SYSTEM):
+        create_superuser_for_functional_tests_command = "echo \"from django.contrib.auth.models import User; User.objects.create_superuser('"+FUNCTIONAL_TEST_LOCAL_ADMIN_USER+"', '', '"+FUNCTIONAL_TEST_LOCAL_ADMIN_USER_PASSWORD+"')\" | python3 build_web/manage.py shell --settings=config.settings.dev"
+        delete_superuser_for_functional_tests_command = "echo \"from django.contrib.auth.models import User; User.objects.get(username='"+FUNCTIONAL_TEST_LOCAL_ADMIN_USER+"', is_superuser=True).delete()\" | python3 build_web/manage.py shell --settings=config.settings.dev"
+        os.system(create_superuser_for_functional_tests_command)
+        addToLD('./cpp/lib')
+        if(platform.system() == "Linux"):
+            os.system('/usr/sbin/lighttpd -f client/lighttpd.develop')
+        else:
+            os.system('/usr/local/bin/lighttpd -f client/lighttpd.develop')
+        command = ['gunicorn', '--env', 'DJANGO_SETTINGS_MODULE=config.settings.dev', '--chdir', 'build_web', '--log-level','critical',
+                   '--timeout', '0', '--workers', '1',
+                   '--bind', WEB_SRV_HOST + ':' + WEB_SRV_PORT,
+                   'wsgi:application']
+        child_process = subprocess.Popen(command, shell=False, stdout=subprocess.PIPE)
+        os.system('python3 functional_tests/functional_tests.py chrome ' + WEB_CLIENT_HOST + ' ' + WEB_CLIENT_PORT + ' ' + FUNCTIONAL_TEST_LOCAL_ADMIN_USER + ' ' + FUNCTIONAL_TEST_LOCAL_ADMIN_USER_PASSWORD)
+        child_process.kill()
+        os.system('kill `cat client/lighttpd.pid`')
+        os.system(delete_superuser_for_functional_tests_command)
+    else:
+        print('Functional tests not available under '+ str(platform.system()) )
+elif env['t'] == 'b':
+    if(platform.system() == "Darwin"):
+        addToLD('./cpp/lib')
+        os.system('/usr/local/bin/lighttpd -f client/lighttpd.develop')
+        command = ['gunicorn', '--env', 'DJANGO_SETTINGS_MODULE=config.settings.dev', '--chdir', 'build_web', '--log-level','critical',
+                   '--timeout', '0', '--workers', '1',
+                   '--bind', WEB_SRV_HOST + ':' + WEB_SRV_PORT,
+                   'wsgi:application']
+        child_process = subprocess.Popen(command, shell=False, stdout=subprocess.PIPE)
+        os.system('python3 functional_tests/blast_functional_tests.py')
+        child_process.kill()
+        os.system('kill `cat client/lighttpd.pid`')
+    else:
+        print('Functional tests for bst not available under '+ str(platform.system()) )
+elif env['t'] == 'bc':
+    if(platform.system() == "Darwin"):
+        addToLD('./cpp/lib')
+        print('-------------------------------------\n')
+        print('Running bst library C++ unit tests...\n')
+        print('-------------------------------------\n')
+        os.system('cpp/dnaasm_bst_test')
+    else:
+        print('Blast cpp tests for bst not available under '+ str(platform.system()) )
+elif env['t'] == 'v':
+    #for testing purposes
+    addToLD('./cpp/lib')
+    SConscript(['web/SConscript'], exports=['env'])
+elif env['t'] == 'p':
+    if(UNIX_SYSTEM):
+        os.system('python3 functional_tests/functional_tests.py chrome ' + PRODUCTION_HOST + ' ' + PRODUCTION_PORT)
+    pass
+elif env['syncdb'] == 1:
+    addToLD('./cpp/lib')
+    os.system('python3 build_web/manage.py makemigrations --settings=config.settings.dev dnaasmpy version current assembly align scaffold user file olc bst')
+    os.system('python3 build_web/manage.py migrate --settings=config.settings.dev')
+elif env['cov'] == 'w':
+    addToLD('./cpp/lib')
+    print('-------------------------------------\n')
+    print('Running Python coverage...\n')
+    print('-------------------------------------\n')
+    os.system("coverage run --source build_web/ build_web/manage.py test --settings=config.settings.dev version production current dnaasmpy assembly align user file logs mail scaffold olc bst")
+    print("\n")
+    os.system("coverage report -m")
+    print("\n")
+elif env['cov'] == 'c':
+    print('-------------------------------------\n')
+    print('Running C++ coverage...\n')
+    print('-------------------------------------\n')
+    os.system("./utils/coverage_html.sh")
+    print("\n")
+elif env['cpp_style'] == 1:
+    if(UNIX_SYSTEM):
+        print("\nCpplint results: ")
+        os.system("cpplint --recursive --extensions=hpp,cpp cpp")
+        print("\nCppcheck results: ")
+        os.system("cppcheck --enable=all --inconclusive --inline-suppr cpp")
+    pass
+elif env['python_style'] == 1:
+    if(UNIX_SYSTEM):
+        print("\nPylint results: ")
+        os.system("pylint web")
+        print("\nPyflakes results: ")
+        os.system("pyflakes web")
+    pass
+elif env['install'] == 1:
+   if not os.path.isfile('build_web/version/version_gen.py'):
+      print('!!! build the application, please !!!')
+   else:
+    SConscript(['install/web_server/SConscript'], exports=['env'] )
+    SConscript(['install/console_application/SConscript'], exports=['env'] )
+elif env['docker'] == 1:
+    if(UNIX_SYSTEM):
+        os.system("docker build -t dnaasm .")
+    pass
+elif env['zip'] == 1:
+    dir_name = os.path.split(os.getcwd())[-1]
+    package_name = DNAASM_NAME + '_' + DNAASM_VER_STRING + '_' + DNAASM_VER_INSTALL
+    os.system('zip ' + package_name + '.zip * -r -x client/bower_components/\*')
+elif env['doxygen'] == 1:
+   f = open('Doxyfile_in', "r")
+   w = open('Doxyfile', "w")
+   for line in f:
+      m = re.match(r'^PROJECT_NUMBER.*$', line)
+      if m:
+         w.write('PROJECT_NUMBER = ' + DNAASM_VER_STRING + '\n')
+      else:
+         w.write(line)
+   os.system('doxygen')
+   env.SideEffect('Doxygen', 'Doxygen_in')
+elif env['create_super_user'] == 1:
+    os.system('python3 build_web/manage.py createsuperuser --settings=config.settings.dev')
+else: #build app
+    SConscript(['cpp/SConscript', 'web/SConscript', 'client/SConscript'], exports=['env'] )
+
+env.Clean('.','../doc/doxygen')
+env.Clean('.','Doxyfile')

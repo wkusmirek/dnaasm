@@ -1,0 +1,29 @@
+<!--
+	@file users.html
+	@brief the AngularJS partial 'users'
+-->
+
+<h1>DnaAssembler - {{'USERS' | translate}}</h1><br>
+
+<div ng-controller="usersController">
+
+	<button id="addUserButton" ng-click="newUserWindow()" title="{{'ADD_USER_TITLE' | translate}}">{{'ADD_USER' | translate}}</button><br><br>
+
+	<table class="greyTable">
+		<tr>
+			<th>{{'USERNAME' | translate}}</th>
+			<th>{{'JOINED_DATE' | translate}}</th>
+			<th>{{'LAST_LOGIN_DATE' | translate}}</th>
+			<th>{{'SUPERUSER' | translate}}</th>
+			<th>{{'DELETE_USER' | translate}}</th>
+		</tr> 
+		<tr ng-model="user" ng-repeat="user in users">
+			<td>{{user.username}}</td>
+			<td id="joinedDate_{{user.username}}"></td>
+			<td id="lastLogin_{{user.username}}">{{parseDate(user.username, user.lastLogin, user.joinedDate)}}</td>
+			<td id="superuser_{{user.username}}"><img ng-src="pict/tick.png" ng-if="user.isSuperuser"/></td>
+			<td id="deleteUserButton_{{user.username}}" ng-click="deleteUser(user.username)" title="{{'DELETE_USER_TITLE' | translate}}"><img ng-src="pict/delete.png" /></td>
+		</tr> 
+	</table>
+	<br><br><br>
+</div>

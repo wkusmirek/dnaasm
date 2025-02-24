@@ -1,0 +1,65 @@
+# -*- mode: Python; -*- scons script
+
+## @file web/SConscript
+#  @brief scons build for server part (Python django)
+
+import os, platform, re, shutil
+
+Import('env')
+
+Import('DNAASM_VER_MAJOR')
+Import('DNAASM_VER_MINOR')
+Import('DNAASM_VER_COMPILATION')
+Import('WEB_SRV_PREFIX')
+Import('DB_NAME DB_USER DB_PASSWORD')
+Import('LOG_WEB_LOC LOG_FILE_NAME')
+Import('PRODUCTION_HOST PRODUCTION_PORT')
+
+def build_websrv_version(target, source, env):
+   file=open(str(target[0]),'w')
+   file.write('WEB_SRV_PREFIX = "' + WEB_SRV_PREFIX + '"\n')
+   file.write('DNAASM_VER_MAJOR = ' + DNAASM_VER_MAJOR + '\n')
+   file.write('DNAASM_VER_MINOR = "' + DNAASM_VER_MINOR + '"\n')
+   file.write('DNAASM_VER_COMPILATION = ' + DNAASM_VER_COMPILATION + '\n')
+   file.write('DB_NAME = "' + DB_NAME + '"\n')
+   file.write('DB_USER = "' + DB_USER + '"\n')
+   file.write('DB_PASSWORD = "' + DB_PASSWORD + '"\n')
+   file.close()
+   return
+
+def build_websrv_production(target, source, env):
+   file=open(str(target[0]),'w')
+   file.write('PRODUCTION_HOST = "' + PRODUCTION_HOST + '"\n')
+   file.write('PRODUCTION_PORT = "' + PRODUCTION_PORT + '"\n')
+   file.close()
+   return
+
+def build_websrv_logs(target, source, env):
+   file=open(str(target[0]),'w')
+   file.write('LOG_WEB_LOC = "' + LOG_WEB_LOC + '"\n')
+   file.write('LOG_FILE_NAME = "' + LOG_FILE_NAME + '"\n')
+   file.close()
+   return
+
+out_dir = '../build_web/'
+file_ver_name = out_dir + 'version/version_gen.py'
+env.Command(file_ver_name, [], build_websrv_version)
+file_ver_name = out_dir + 'production/production_gen.py'
+env.Command(file_ver_name, [], build_websrv_production)
+file_ver_name = out_dir + 'logs/logs_gen.py'
+env.Command(file_ver_name, [], build_websrv_logs)
+
+#install web
+app_src = '../web'
+for root, dirs, files in os.walk(app_src):
+   p = os.path.relpath(root, app_src) #relative path
+   for name in files:
+      filename = os.path.join(root, name)
+      inst_file = env.Install(out_dir + p, filename)
+      if re.match('.*\.py$', filename):
+         pyc = env.File(str(filename) + 'c')
+         env.SideEffect(pyc, inst_file)
+
+
+env.Clean('.',out_dir)
+

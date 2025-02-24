@@ -1,0 +1,46 @@
+# -*- mode: Python; -*-
+import platform, os
+
+Import('env')
+Import('shared_lib_path')
+Import('LOG_CPP_LOC')
+Import('MAX_KMER_LENGTH')
+
+#------------------------------------------------------------------------------
+# build shared library with common features
+#------------------------------------------------------------------------------
+
+lib_name = 'dnaasm_common'
+
+env_dll = env.Clone()
+
+if(platform.system() == "Linux"):
+   env_dll.Prepend( LIBS = [ 'boost_thread', 'boost_iostreams', 'boost_regex', 'boost_log', 'boost_system', 'boost_filesystem' ] )
+
+elif(platform.system() == "Darwin"):
+   env_dll.Prepend( LIBS = [ 'boost_thread-mt', 'boost_iostreams', 'boost_log-mt', 'boost_regex', 'boost_system' ] )
+
+elif(platform.system() == "Windows"):
+   env_dll.Append( CPPFLAGS = ' /D "CALC_EXPORTS" /W4 ' )
+
+else:
+   print(platform.system() + " not supported")
+
+env_dll.Append( CPPDEFINES=['LOG_CPP_LOC='+LOG_CPP_LOC] )
+env_dll.Append( CPPDEFINES=['MAX_KMER_LENGTH='+MAX_KMER_LENGTH] )
+
+common_lib = env_dll.SharedLibrary(
+    target = os.path.join(shared_lib_path, lib_name),
+    source = [
+        'InputFile.cpp',
+        'Read.cpp',
+        'FileReader.cpp',
+        'Parameters.cpp',
+        'log.cpp',
+        'HashTableKeyHash.cpp',
+        'HashTableKeyEqual.cpp',
+        'DnaSequenceRepresentationConverter.cpp',
+        'MurmurHash3.cpp'
+    ])
+
+Return('common_lib')

@@ -1,0 +1,50 @@
+# -*- mode: Python; -*-
+import platform, os
+
+Import('env')
+Import('shared_lib_path')
+
+#------------------------------------------------------------------------------
+# build Overlap Layout Consensus shared library
+#------------------------------------------------------------------------------
+
+lib_name = 'dnaasm_olc'
+
+env_dll = env.Clone()
+
+if(platform.system() == "Linux"):
+   env_dll.Prepend( LIBS = [ 'dnaasm_common', 'boost_thread' ] )
+
+elif(platform.system() == "Darwin"):
+   env_dll.Prepend( LIBS = [ 'boost_thread-mt', 'boost_system', 'dnaasm_common' ] )
+
+elif(platform.system() == "Windows"):
+   env_dll.Append( CPPFLAGS = ' /D "CALC_EXPORTS" /W4 ' )
+   env_dll.Prepend( LIBS = [ 'dnaasm_common' ] )
+
+else:
+   print(platform.system() + " not supported")
+
+olc_lib = env_dll.SharedLibrary(
+    target = os.path.join(shared_lib_path, lib_name),
+    source = [
+        'SmithWatermanAligner.cpp',
+        'HashObj.cpp',
+        'MinHash.cpp',
+        'OlcAssembly.cpp',
+        'OlcParameters.cpp',
+        'OvlpGraphBuilder.cpp',
+        'LayoutFormer.cpp',
+        'NWConsensusMaker.cpp',
+        'Consensus.cpp',
+        'mhap/AbstractMatchSearch.cpp',
+        'mhap/MinHashSearch.cpp',
+        'mhap/HashUtils.cpp',
+        'mhap/MinHashSketch.cpp',
+        'mhap/SequenceSketchStreamer.cpp',
+        'mhap/FastaData.cpp',
+        'mhap/MatchData.cpp',
+        'mhap/BottomOverlapSketch.cpp'
+    ])
+
+Return('olc_lib')

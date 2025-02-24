@@ -1,0 +1,13 @@
+<!--
+	@file login_popup.html
+	@brief the AngularJS partial 'login_popup'
+-->
+
+<div class="login-wrap" ng-controller="loginController">
+	<div class="form">
+		<input type="text" id="username" placeholder="{{'USERNAME' | translate }}" name="un" title="{{'USERNAME_TITLE' | translate}}" />
+		<input type="password" id="password" placeholder="{{'PASSWORD' | translate }}" name="pw" title="{{'PASSWORD_TITLE' | translate}}" />
+		<button id="loginButton" ng-click="login()" title="{{'LOG_IN_TITLE' | translate}}">{{'SIGN_IN' | translate}}</button>
+	</div>
+</div>
+
