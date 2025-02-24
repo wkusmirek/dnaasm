@@ -51,15 +51,15 @@ RUN mkdir build; \
 
 WORKDIR /tmp
 
-RUN hg clone http://hg.code.sf.net/p/dnaasm/code dnaasm-code
+RUN git clone https://github.com/wkusmirek/dnaasm.git
 
-WORKDIR /tmp/dnaasm-code/impl
+WORKDIR /tmp/dnaasm/impl
 
 RUN cp build_default.ini build_custom.ini
 
 RUN sed -i 's/python3.4/python3.5/g' build_custom.ini
 
-WORKDIR /tmp/dnaasm-code/impl
+WORKDIR /tmp/dnaasm/impl
 
 # RUN rm cpp/src/olc/SConscript
 
