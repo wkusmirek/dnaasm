@@ -335,7 +335,7 @@ elif env['doxygen'] == 1:
 elif env['create_super_user'] == 1:
     os.system('python3 build_web/manage.py createsuperuser --settings=config.settings.dev')
 else: #build app
-    SConscript(['cpp/SConscript', 'web/SConscript', 'client/SConscript'], exports=['env'] )
+    SConscript(['cpp/SConscript'], exports=['env'] )
 
 env.Clean('.','../doc/doxygen')
 env.Clean('.','Doxyfile')
